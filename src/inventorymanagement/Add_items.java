@@ -5,6 +5,12 @@
  */
 package inventorymanagement;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 
 /**
@@ -19,7 +25,16 @@ public class Add_items extends javax.swing.JFrame {
     public Add_items() {
         initComponents();
     }
+    
+    //database connentivity
+    static final String DB_URL = "jdbc:mysql://localhost:3306/inventory";
+    static final String DB_DRV = "com.mysql.jdbc.Driver";
+    static final String DB_USER = "user1";
+    static final String DB_PASSWD = "User1db@123";
 
+    Connection connection = null;
+    //Statement statement = null;
+    PreparedStatement pstm = null;
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -36,23 +51,18 @@ public class Add_items extends javax.swing.JFrame {
         item_p2 = new javax.swing.JPanel();
         item_lbl_id = new javax.swing.JLabel();
         item_lbl_name = new javax.swing.JLabel();
-        item_lbl_price = new javax.swing.JLabel();
         item_lbl_Qnt = new javax.swing.JLabel();
         item_lbl_category = new javax.swing.JLabel();
-        item_lbl_supplier = new javax.swing.JLabel();
-        item_lbl_description = new javax.swing.JLabel();
         item_txt_id = new javax.swing.JTextField();
         item_txt_name = new javax.swing.JTextField();
         item_txt_price = new javax.swing.JTextField();
         item_spinner_qnt = new javax.swing.JSpinner();
-        item_txt_supplierID = new javax.swing.JTextField();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        item_txta_Desc = new javax.swing.JTextArea();
         item_dropdown_category = new javax.swing.JComboBox<>();
         item_btn_add = new javax.swing.JButton();
         item_btn_edit = new javax.swing.JButton();
         item_btn_delete = new javax.swing.JButton();
         item_btn_reset = new javax.swing.JButton();
+        item_lbl_price = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -125,10 +135,6 @@ public class Add_items extends javax.swing.JFrame {
         item_lbl_name.setText("Item Name");
         item_lbl_name.setName("item_lbl_name"); // NOI18N
 
-        item_lbl_price.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_lbl_price.setText("Item Price");
-        item_lbl_price.setName("item_lbl_price"); // NOI18N
-
         item_lbl_Qnt.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         item_lbl_Qnt.setText("Quantity");
         item_lbl_Qnt.setName("item_lbl_Qnt"); // NOI18N
@@ -136,14 +142,6 @@ public class Add_items extends javax.swing.JFrame {
         item_lbl_category.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         item_lbl_category.setText("Category");
         item_lbl_category.setName("item_lbl_category"); // NOI18N
-
-        item_lbl_supplier.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_lbl_supplier.setText("Supplier ID");
-        item_lbl_supplier.setName("item_lbl_supplier"); // NOI18N
-
-        item_lbl_description.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_lbl_description.setText("Description");
-        item_lbl_description.setName("item_lbl_description"); // NOI18N
 
         item_txt_id.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         item_txt_id.setName("item_txt_id"); // NOI18N
@@ -157,19 +155,14 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.setModel(new javax.swing.SpinnerNumberModel(0, 0, null, 1));
         item_spinner_qnt.setName("item_spinner_qnt"); // NOI18N
 
-        item_txt_supplierID.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
-        item_txt_supplierID.setName("item_txt_supplierID"); // NOI18N
-
-        item_txta_Desc.setColumns(20);
-        item_txta_Desc.setFont(new java.awt.Font("Times New Roman", 0, 12)); // NOI18N
-        item_txta_Desc.setRows(5);
-        item_txta_Desc.setName("item_txta_Desc"); // NOI18N
-        jScrollPane1.setViewportView(item_txta_Desc);
-        item_txta_Desc.getAccessibleContext().setAccessibleName("Item description");
-
         item_dropdown_category.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Undefined", "Electronics", "Grocery", "Pharmacy", "Medical", "Instrument", "others" }));
+        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "\" \"", "Electronics", "Grocery", "Pharmacy", "Medical", "Instrument", "others" }));
         item_dropdown_category.setName("item_dropdown_category"); // NOI18N
+        item_dropdown_category.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                item_dropdown_categoryActionPerformed(evt);
+            }
+        });
 
         item_btn_add.setBackground(new java.awt.Color(255, 204, 102));
         item_btn_add.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
@@ -201,6 +194,9 @@ public class Add_items extends javax.swing.JFrame {
         item_btn_reset.setText("Reset");
         item_btn_reset.setName("item_btn_reset"); // NOI18N
 
+        item_lbl_price.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
+        item_lbl_price.setText("Price");
+
         javax.swing.GroupLayout item_p2Layout = new javax.swing.GroupLayout(item_p2);
         item_p2.setLayout(item_p2Layout);
         item_p2Layout.setHorizontalGroup(
@@ -211,21 +207,22 @@ public class Add_items extends javax.swing.JFrame {
                         .addGap(54, 54, 54)
                         .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(item_lbl_id)
-                            .addComponent(item_lbl_name))
+                            .addComponent(item_lbl_name)
+                            .addGroup(item_p2Layout.createSequentialGroup()
+                                .addGap(23, 23, 23)
+                                .addComponent(item_lbl_price)))
                         .addGap(2, 2, 2))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, item_p2Layout.createSequentialGroup()
                         .addContainerGap()
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(item_lbl_supplier)
-                            .addComponent(item_lbl_price)
-                            .addComponent(item_btn_reset))))
+                        .addComponent(item_btn_reset)
+                        .addGap(30, 30, 30)))
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addGroup(item_p2Layout.createSequentialGroup()
                         .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                             .addGroup(item_p2Layout.createSequentialGroup()
                                 .addGap(24, 24, 24)
                                 .addComponent(item_txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
                                 .addComponent(item_lbl_Qnt))
                             .addGroup(javax.swing.GroupLayout.Alignment.LEADING, item_p2Layout.createSequentialGroup()
                                 .addGap(18, 18, 18)
@@ -235,20 +232,13 @@ public class Add_items extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                         .addComponent(item_lbl_category))
                                     .addGroup(item_p2Layout.createSequentialGroup()
-                                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                            .addComponent(item_txt_supplierID, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 214, Short.MAX_VALUE)
-                                            .addComponent(item_txt_price, javax.swing.GroupLayout.Alignment.LEADING))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(item_lbl_description)))))
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(item_p2Layout.createSequentialGroup()
-                                .addGap(32, 32, 32)
-                                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(item_dropdown_category, 0, 214, Short.MAX_VALUE)
-                                    .addComponent(item_spinner_qnt)))
-                            .addGroup(item_p2Layout.createSequentialGroup()
-                                .addGap(40, 40, 40)
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                        .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addGap(0, 0, Short.MAX_VALUE)))))
+                        .addGap(32, 32, 32)
+                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(item_dropdown_category, 0, 214, Short.MAX_VALUE)
+                            .addComponent(item_spinner_qnt))
+                        .addGap(8, 8, 8))
                     .addGroup(item_p2Layout.createSequentialGroup()
                         .addGap(119, 119, 119)
                         .addComponent(item_btn_add)
@@ -274,26 +264,16 @@ public class Add_items extends javax.swing.JFrame {
                     .addComponent(item_lbl_category)
                     .addComponent(item_dropdown_category, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(56, 56, 56)
-                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(item_p2Layout.createSequentialGroup()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(item_p2Layout.createSequentialGroup()
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(item_lbl_price)
-                            .addComponent(item_lbl_description))
-                        .addGap(46, 46, 46)
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(item_lbl_supplier)
-                            .addComponent(item_txt_supplierID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 97, Short.MAX_VALUE)
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(item_btn_reset)
-                            .addComponent(item_btn_add)
-                            .addComponent(item_btn_edit)
-                            .addComponent(item_btn_delete))
-                        .addGap(37, 37, 37))))
+                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(item_lbl_price))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 177, Short.MAX_VALUE)
+                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(item_btn_reset)
+                    .addComponent(item_btn_add)
+                    .addComponent(item_btn_edit)
+                    .addComponent(item_btn_delete))
+                .addGap(37, 37, 37))
         );
 
         item_lbl_id.getAccessibleContext().setAccessibleDescription("");
@@ -301,7 +281,6 @@ public class Add_items extends javax.swing.JFrame {
         item_txt_name.getAccessibleContext().setAccessibleName("Item Name");
         item_txt_price.getAccessibleContext().setAccessibleName("item price");
         item_spinner_qnt.getAccessibleContext().setAccessibleName("Item Quantity");
-        item_txt_supplierID.getAccessibleContext().setAccessibleName("Item_SupplierID");
         item_dropdown_category.getAccessibleContext().setAccessibleName("Item category");
         item_btn_edit.getAccessibleContext().setAccessibleName("item edit");
 
@@ -336,34 +315,77 @@ public class Add_items extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void item_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_addActionPerformed
-        // TODO add your handling code here:
-        
-        String[] item_arr = new String[8];
-
+         String[] item_arr = new String[8];
+        int countInserted = 0;
         String item_id = item_txt_id.getText();
         String item_name = item_txt_name.getText();
         String item_price = item_txt_price.getText();
-        String item_email = item_txt_supplierID.getText();
-        Object item_category = item_dropdown_category.getSelectedObjects();
+        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
         //String item_category = item_dropdown_category.getSelectedItem()
-        String item_address = item_txta_Desc.getText();
         Object item_qnt;
         item_qnt = item_spinner_qnt.getValue();
+
+        int item_id1 = Integer.parseInt(item_txt_id.getText());
+        System.out.println("id " + item_id1);
+
+        String item_name1 = item_txt_name.getText();
+        System.out.println("name " + item_name1);
+
+        Object item_qnt1;
+        item_qnt1 = item_spinner_qnt.getValue();
+        int item_qnt2 = Integer.parseInt(String.valueOf(item_qnt1));
+        System.out.println("Quantity " + item_qnt2);
+
+        int item_category1 = item_dropdown_category.getSelectedIndex();
+        System.out.println("category " + item_category1);
+
+        double item_price1 = Double.parseDouble(item_txt_price.getText());
+        System.out.println("price " + item_price1);
+
+        try {
+
+            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWD);
+           //statement = connection.createStatement();
+
+            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
+            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
+            String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
+            
+            
+            PreparedStatement pstm = connection.prepareStatement(sqlInsert);
+            pstm.setInt(1, item_id1);
+            pstm.setString(2, item_name1);
+            pstm.setInt(3, item_qnt2);
+            pstm.setInt(4, item_category1);
+            pstm.setDouble(5, item_price1);
+            
+            System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
+            countInserted = pstm.executeUpdate();
+            System.out.println(countInserted + " records inserted.\n");
+
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            try {
+                connection.close();
+                //statement.close();
+            } catch (SQLException ex) {
+                Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
+            }
+
+        }
 
         item_arr[0] = item_id;
         item_arr[1] = item_name;
         item_arr[2] = item_price;
-        item_arr[3] = item_email;
         item_arr[4] = String.valueOf(item_qnt);
         item_arr[5] = String.valueOf(item_category);
-        item_arr[6] = item_address;
+        //item_arr[6] = item_address;
+        item_arr[6] = countInserted + " records inserted.\n";
         item_arr[7] = "\n Records inserted successfully";
-        
-        
+
         JOptionPane.showMessageDialog(this, item_arr);
-        
-        
-        
+
         
     }//GEN-LAST:event_item_btn_addActionPerformed
 
@@ -379,6 +401,10 @@ public class Add_items extends javax.swing.JFrame {
 
         // TODO add your handling code here:
     }//GEN-LAST:event_item_btn_dashbdActionPerformed
+
+    private void item_dropdown_categoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_dropdown_categoryActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_item_dropdown_categoryActionPerformed
 
     /**
      * @param args the command line arguments
@@ -426,11 +452,9 @@ public class Add_items extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> item_dropdown_category;
     private javax.swing.JLabel item_lbl_Qnt;
     private javax.swing.JLabel item_lbl_category;
-    private javax.swing.JLabel item_lbl_description;
     private javax.swing.JLabel item_lbl_id;
     private javax.swing.JLabel item_lbl_name;
     private javax.swing.JLabel item_lbl_price;
-    private javax.swing.JLabel item_lbl_supplier;
     private javax.swing.JLabel item_lbl_title;
     private javax.swing.JPanel item_p1;
     private javax.swing.JPanel item_p2;
@@ -438,9 +462,6 @@ public class Add_items extends javax.swing.JFrame {
     private javax.swing.JTextField item_txt_id;
     private javax.swing.JTextField item_txt_name;
     private javax.swing.JTextField item_txt_price;
-    private javax.swing.JTextField item_txt_supplierID;
-    private javax.swing.JTextArea item_txta_Desc;
     private javax.swing.JPanel jPanel4;
-    private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
 }
