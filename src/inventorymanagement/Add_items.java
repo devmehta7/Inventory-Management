@@ -8,7 +8,9 @@ package inventorymanagement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -25,15 +27,39 @@ public class Add_items extends javax.swing.JFrame {
     public Add_items() {
         initComponents();
     }
+    // functions
+    void set_data(int id,String name,int quantity,int category,double price){
+        item_txt_id.setText(String.valueOf(id));
+        item_txt_name.setText(name);
+        item_txt_price.setText(String.valueOf(price));
+        item_spinner_qnt.setValue(quantity);
+        item_dropdown_category.setSelectedIndex(category);   
+    }
+    
+    void reset_data(){
+        item_txt_id.setText("");
+        item_txt_name.setText("");
+        item_txt_price.setText("");
+        item_dropdown_category.setSelectedIndex(0);
+        item_spinner_qnt.setValue(0);     
+    }
+    
     
     //database connentivity
-    static final String DB_URL = "jdbc:mysql://localhost:3306/inventory";
-    static final String DB_DRV = "com.mysql.jdbc.Driver";
-    static final String DB_USER = "user1";
-    static final String DB_PASSWD = "User1db@123";
+//    static final String DB_URL = "jdbc:mysql://localhost:3306/inventory";
+//    static final String DB_DRV = "com.mysql.jdbc.Driver";
+//    static final String DB_USER = "user1";
+//    static final String DB_PASSWD = "User1db@123";
 
-    Connection connection = null;
-    //Statement statement = null;
+    // global variables...
+    int item_code;
+    String name;
+    double price;
+    int category_id;
+    int Quantity;
+//    
+//  Statement stmt=null;
+    Connection c;
     PreparedStatement pstm = null;
     /**
      * This method is called from within the constructor to initialize the form.
@@ -63,6 +89,8 @@ public class Add_items extends javax.swing.JFrame {
         item_btn_delete = new javax.swing.JButton();
         item_btn_reset = new javax.swing.JButton();
         item_lbl_price = new javax.swing.JLabel();
+        item_btn_search = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -156,7 +184,7 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.setName("item_spinner_qnt"); // NOI18N
 
         item_dropdown_category.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "\" \"", "Electronics", "Grocery", "Pharmacy", "Medical", "Instrument", "others" }));
+        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "select", "Electronics", "Grocery", "Pharmacy", "Medical", "Instrument", "others" }));
         item_dropdown_category.setName("item_dropdown_category"); // NOI18N
         item_dropdown_category.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -193,60 +221,69 @@ public class Add_items extends javax.swing.JFrame {
         item_btn_reset.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         item_btn_reset.setText("Reset");
         item_btn_reset.setName("item_btn_reset"); // NOI18N
+        item_btn_reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                item_btn_resetActionPerformed(evt);
+            }
+        });
 
         item_lbl_price.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         item_lbl_price.setText("Price");
+
+        item_btn_search.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        item_btn_search.setText("Search");
+        item_btn_search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                item_btn_searchActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel1.setText("*use id of item to to search ");
 
         javax.swing.GroupLayout item_p2Layout = new javax.swing.GroupLayout(item_p2);
         item_p2.setLayout(item_p2Layout);
         item_p2Layout.setHorizontalGroup(
             item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(item_p2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, item_p2Layout.createSequentialGroup()
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(item_p2Layout.createSequentialGroup()
                         .addGap(54, 54, 54)
                         .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(item_lbl_id)
                             .addComponent(item_lbl_name)
-                            .addGroup(item_p2Layout.createSequentialGroup()
-                                .addGap(23, 23, 23)
-                                .addComponent(item_lbl_price)))
-                        .addGap(2, 2, 2))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, item_p2Layout.createSequentialGroup()
-                        .addContainerGap()
+                            .addComponent(item_lbl_price))
+                        .addGap(2, 2, 2)
+                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(item_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(item_txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(item_lbl_Qnt)
+                            .addComponent(item_lbl_category))
+                        .addGap(31, 31, 31))
+                    .addGroup(item_p2Layout.createSequentialGroup()
+                        .addGap(85, 85, 85)
                         .addComponent(item_btn_reset)
-                        .addGap(30, 30, 30)))
-                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(item_p2Layout.createSequentialGroup()
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(item_p2Layout.createSequentialGroup()
-                                .addGap(24, 24, 24)
-                                .addComponent(item_txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
-                                .addComponent(item_lbl_Qnt))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, item_p2Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(item_p2Layout.createSequentialGroup()
-                                        .addComponent(item_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(item_lbl_category))
-                                    .addGroup(item_p2Layout.createSequentialGroup()
-                                        .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE)))))
-                        .addGap(32, 32, 32)
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(item_dropdown_category, 0, 214, Short.MAX_VALUE)
-                            .addComponent(item_spinner_qnt))
-                        .addGap(8, 8, 8))
-                    .addGroup(item_p2Layout.createSequentialGroup()
-                        .addGap(119, 119, 119)
+                        .addGap(79, 79, 79)
                         .addComponent(item_btn_add)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(item_btn_search)
+                        .addGap(69, 69, 69)))
+                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(item_dropdown_category, 0, 214, Short.MAX_VALUE)
+                        .addComponent(item_spinner_qnt))
+                    .addGroup(item_p2Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
                         .addComponent(item_btn_edit)
-                        .addGap(98, 98, 98)
-                        .addComponent(item_btn_delete)))
-                .addGap(81, 81, 81))
+                        .addGap(71, 71, 71)
+                        .addComponent(item_btn_delete))
+                    .addGroup(item_p2Layout.createSequentialGroup()
+                        .addGap(149, 149, 149)
+                        .addComponent(jLabel1)))
+                .addGap(24, 24, 24))
         );
         item_p2Layout.setVerticalGroup(
             item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -266,13 +303,16 @@ public class Add_items extends javax.swing.JFrame {
                 .addGap(56, 56, 56)
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(item_lbl_price))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 177, Short.MAX_VALUE)
+                    .addComponent(item_lbl_price, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
+                .addComponent(jLabel1)
+                .addGap(64, 64, 64)
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(item_btn_reset)
                     .addComponent(item_btn_add)
                     .addComponent(item_btn_edit)
-                    .addComponent(item_btn_delete))
+                    .addComponent(item_btn_delete)
+                    .addComponent(item_btn_search))
                 .addGap(37, 37, 37))
         );
 
@@ -344,7 +384,7 @@ public class Add_items extends javax.swing.JFrame {
 
         try {
 
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWD);
+            c=Conn.setConnect();
            //statement = connection.createStatement();
 
             //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
@@ -352,7 +392,7 @@ public class Add_items extends javax.swing.JFrame {
             String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
             
             
-            PreparedStatement pstm = connection.prepareStatement(sqlInsert);
+            PreparedStatement pstm = c.prepareStatement(sqlInsert);
             pstm.setInt(1, item_id1);
             pstm.setString(2, item_name1);
             pstm.setInt(3, item_qnt2);
@@ -367,7 +407,7 @@ public class Add_items extends javax.swing.JFrame {
             ex.printStackTrace();
         } finally {
             try {
-                connection.close();
+                c.close();
                 //statement.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
@@ -405,6 +445,51 @@ public class Add_items extends javax.swing.JFrame {
     private void item_dropdown_categoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_dropdown_categoryActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_item_dropdown_categoryActionPerformed
+
+    private void item_btn_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_resetActionPerformed
+        // TODO add your handling code here:
+       reset_data();
+    }//GEN-LAST:event_item_btn_resetActionPerformed
+
+    private void item_btn_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_searchActionPerformed
+       
+        
+        // main operation...
+        try{
+            c=Conn.setConnect();
+            
+            int id = Integer.parseInt(item_txt_id.getText());
+            String query="select * from item_master where item_code=?";
+            PreparedStatement psmt = c.prepareStatement(query);
+            psmt.setInt(1,id);
+            ResultSet rs = psmt.executeQuery();
+            //int temp=0;
+            while(rs.next()){
+                //temp=temp+1;
+                item_code = rs.getInt("item_code");
+                category_id = rs.getInt("category_id");
+                name = rs.getString("name");
+                price=rs.getDouble("price");
+                Quantity = rs.getInt("Quantity");
+                
+               
+            }
+            set_data(item_code, name, Quantity, category_id, price);
+            
+            //JOptionPane.showMessageDialog(this, temp);
+
+            
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            try{c.close();}
+            catch(Exception e){e.printStackTrace();}
+            
+        }
+        
+    }//GEN-LAST:event_item_btn_searchActionPerformed
 
     /**
      * @param args the command line arguments
@@ -449,6 +534,7 @@ public class Add_items extends javax.swing.JFrame {
     private javax.swing.JButton item_btn_delete;
     private javax.swing.JButton item_btn_edit;
     private javax.swing.JButton item_btn_reset;
+    private javax.swing.JButton item_btn_search;
     private javax.swing.JComboBox<String> item_dropdown_category;
     private javax.swing.JLabel item_lbl_Qnt;
     private javax.swing.JLabel item_lbl_category;
@@ -462,6 +548,7 @@ public class Add_items extends javax.swing.JFrame {
     private javax.swing.JTextField item_txt_id;
     private javax.swing.JTextField item_txt_name;
     private javax.swing.JTextField item_txt_price;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel4;
     // End of variables declaration//GEN-END:variables
 }
