@@ -21,14 +21,22 @@ import javax.swing.JOptionPane;
  */
 public class Add_items extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Add_items
-     */
     public Add_items() {
         initComponents();
     }
+    // global variables...
+    int item_code;
+    String name;
+    double price;
+    int category_id;
+    int Quantity;
+
+    Connection c;
+    PreparedStatement pstm = null;
     // functions
-    void set_data(int id,String name,int quantity,int category,double price){
+    
+    //Sets variable data to text fields....
+    void set_fields(int id,String name,int quantity,int category,double price){
         item_txt_id.setText(String.valueOf(id));
         item_txt_name.setText(name);
         item_txt_price.setText(String.valueOf(price));
@@ -36,12 +44,53 @@ public class Add_items extends javax.swing.JFrame {
         item_dropdown_category.setSelectedIndex(category);   
     }
     
-    void reset_data(){
+    // clear every text fields....
+    void reset_fields(){
         item_txt_id.setText("");
         item_txt_name.setText("");
         item_txt_price.setText("");
         item_dropdown_category.setSelectedIndex(0);
         item_spinner_qnt.setValue(0);     
+    }
+    
+    // function to get textfeild data to database....
+    void get_data(String query){
+        try{
+            int countInserted = 0;
+        
+            c=Conn.setConnect();
+            
+            item_code = Integer.parseInt(item_txt_id.getText());
+            name = item_txt_name.getText();
+            Object item_qnt1;
+            item_qnt1 = item_spinner_qnt.getValue();
+            Quantity = Integer.parseInt(String.valueOf(item_qnt1));
+            category_id = item_dropdown_category.getSelectedIndex();
+            price = Double.parseDouble(item_txt_price.getText());
+        
+            pstm = c.prepareStatement(query);
+            pstm.setInt(1, item_code);
+            pstm.setString(2, name);
+            pstm.setInt(3, Quantity);
+            pstm.setInt(4, category_id);
+            pstm.setDouble(5, price);
+            
+            countInserted = pstm.executeUpdate();
+            System.out.println(countInserted+" row affected.");
+        
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            try{
+                c.close();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+          
     }
     
     
@@ -51,16 +100,10 @@ public class Add_items extends javax.swing.JFrame {
 //    static final String DB_USER = "user1";
 //    static final String DB_PASSWD = "User1db@123";
 
-    // global variables...
-    int item_code;
-    String name;
-    double price;
-    int category_id;
-    int Quantity;
+    
 //    
 //  Statement stmt=null;
-    Connection c;
-    PreparedStatement pstm = null;
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -355,82 +398,84 @@ public class Add_items extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void item_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_addActionPerformed
-         String[] item_arr = new String[8];
-        int countInserted = 0;
-        String item_id = item_txt_id.getText();
-        String item_name = item_txt_name.getText();
-        String item_price = item_txt_price.getText();
-        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
-        //String item_category = item_dropdown_category.getSelectedItem()
-        Object item_qnt;
-        item_qnt = item_spinner_qnt.getValue();
-
-        int item_id1 = Integer.parseInt(item_txt_id.getText());
-        System.out.println("id " + item_id1);
-
-        String item_name1 = item_txt_name.getText();
-        System.out.println("name " + item_name1);
-
-        Object item_qnt1;
-        item_qnt1 = item_spinner_qnt.getValue();
-        int item_qnt2 = Integer.parseInt(String.valueOf(item_qnt1));
-        System.out.println("Quantity " + item_qnt2);
-
-        int item_category1 = item_dropdown_category.getSelectedIndex();
-        System.out.println("category " + item_category1);
-
-        double item_price1 = Double.parseDouble(item_txt_price.getText());
-        System.out.println("price " + item_price1);
-
-        try {
-
-            c=Conn.setConnect();
-           //statement = connection.createStatement();
-
-            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
-            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
-            String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
-            
-            
-            PreparedStatement pstm = c.prepareStatement(sqlInsert);
-            pstm.setInt(1, item_id1);
-            pstm.setString(2, item_name1);
-            pstm.setInt(3, item_qnt2);
-            pstm.setInt(4, item_category1);
-            pstm.setDouble(5, item_price1);
-            
-            System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
-            countInserted = pstm.executeUpdate();
-            System.out.println(countInserted + " records inserted.\n");
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                c.close();
-                //statement.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-
-        item_arr[0] = item_id;
-        item_arr[1] = item_name;
-        item_arr[2] = item_price;
-        item_arr[4] = String.valueOf(item_qnt);
-        item_arr[5] = String.valueOf(item_category);
-        //item_arr[6] = item_address;
-        item_arr[6] = countInserted + " records inserted.\n";
-        item_arr[7] = "\n Records inserted successfully";
-
-        JOptionPane.showMessageDialog(this, item_arr);
-
+//        String[] item_arr = new String[8];
+//        int countInserted = 0;
+//        String item_id = item_txt_id.getText();
+//        String item_name = item_txt_name.getText();
+//        String item_price = item_txt_price.getText();
+//        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
+//        //String item_category = item_dropdown_category.getSelectedItem()
+//        Object item_qnt;
+//        item_qnt = item_spinner_qnt.getValue();
+//
+//        item_code = Integer.parseInt(item_txt_id.getText());
+//        System.out.println("id " + item_code);
+//
+//        name = item_txt_name.getText();
+//        System.out.println("name " + name);
+//
+//        Object item_qnt1;
+//        item_qnt1 = item_spinner_qnt.getValue();
+//        Quantity = Integer.parseInt(String.valueOf(item_qnt1));
+//        System.out.println("Quantity " + Quantity);
+//
+//        category_id = item_dropdown_category.getSelectedIndex();
+//        System.out.println("category " + category_id);
+//
+//        price = Double.parseDouble(item_txt_price.getText());
+//        System.out.println("price " + price);
+//
+//        try {
+//
+//            c=Conn.setConnect();
+//           //statement = connection.createStatement();
+//
+//            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
+//            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
+              String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
+              get_data(sqlInsert);
+//            
+//            
+//            pstm = c.prepareStatement(sqlInsert);
+//            pstm.setInt(1, item_code);
+//            pstm.setString(2, name);
+//            pstm.setInt(3, Quantity);
+//            pstm.setInt(4, category_id);
+//            pstm.setDouble(5, price);
+//            
+//            System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
+//            countInserted = pstm.executeUpdate();
+//            System.out.println(countInserted + " records inserted.\n");
+//
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        } finally {
+//            try {
+//                c.close();
+//                //statement.close();
+//            } catch (SQLException ex) {
+//                Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//
+//        }
+//
+//        item_arr[0] = item_id;
+//        item_arr[1] = item_name;
+//        item_arr[2] = item_price;
+//        item_arr[4] = String.valueOf(item_qnt);
+//        item_arr[5] = String.valueOf(item_category);
+//        //item_arr[6] = item_address;
+//        item_arr[6] = countInserted + " records inserted.\n";
+//        item_arr[7] = "\n Records inserted successfully";
+//
+//        JOptionPane.showMessageDialog(this, item_arr);
+//
         
     }//GEN-LAST:event_item_btn_addActionPerformed
 
     private void item_btn_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_editActionPerformed
         // TODO add your handling code here:
+        
     }//GEN-LAST:event_item_btn_editActionPerformed
 
     private void item_btn_dashbdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_dashbdActionPerformed
@@ -448,7 +493,7 @@ public class Add_items extends javax.swing.JFrame {
 
     private void item_btn_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_resetActionPerformed
         // TODO add your handling code here:
-       reset_data();
+        reset_fields();
     }//GEN-LAST:event_item_btn_resetActionPerformed
 
     private void item_btn_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_searchActionPerformed
@@ -474,7 +519,7 @@ public class Add_items extends javax.swing.JFrame {
                 
                
             }
-            set_data(item_code, name, Quantity, category_id, price);
+            set_fields(item_code, name, Quantity, category_id, price);
             
             //JOptionPane.showMessageDialog(this, temp);
 
