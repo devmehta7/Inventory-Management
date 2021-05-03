@@ -53,13 +53,26 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.setValue(0);     
     }
     
-    // function to get textfeild data to database....
-    void get_data(String query){
-        try{
-            int countInserted = 0;
+    // function to get all textfeilds data to database....
+    void set_data(String query,int operation){
+        // variables for dialog box...
+        String[] item_arr = new String[8];
+        int countInserted = 0;
+        String item_id = item_txt_id.getText();
+        String item_name = item_txt_name.getText();
+        String item_price = item_txt_price.getText();
+        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
+        //String item_category = item_dropdown_category.getSelectedItem()
+        Object item_qnt;
+        item_qnt = item_spinner_qnt.getValue();
         
+        String op = null;
+        // main operation...
+        try{
+                    
             c=Conn.setConnect();
             
+            // assigning form values to variables..  
             item_code = Integer.parseInt(item_txt_id.getText());
             name = item_txt_name.getText();
             Object item_qnt1;
@@ -67,14 +80,32 @@ public class Add_items extends javax.swing.JFrame {
             Quantity = Integer.parseInt(String.valueOf(item_qnt1));
             category_id = item_dropdown_category.getSelectedIndex();
             price = Double.parseDouble(item_txt_price.getText());
-        
-            pstm = c.prepareStatement(query);
-            pstm.setInt(1, item_code);
-            pstm.setString(2, name);
-            pstm.setInt(3, Quantity);
-            pstm.setInt(4, category_id);
-            pstm.setDouble(5, price);
             
+            pstm = c.prepareStatement(query);
+            
+            // checking the type of operation(insert,update,delete)... 
+            if (operation== 0){
+                pstm.setInt(1, item_code);
+                pstm.setString(2, name);
+                pstm.setInt(3, Quantity);
+                pstm.setInt(4, category_id);
+                pstm.setDouble(5, price);
+                op="Inserted";
+            }
+            else if (operation == 1){
+                pstm.setString(1, name);
+                pstm.setInt(2, Quantity);
+                pstm.setInt(3, category_id);
+                pstm.setDouble(4, price);
+                pstm.setInt(5, item_code);
+                op="Updated";
+            }
+            else if(operation == 2){
+                pstm.setInt(1,item_code);
+                op="Deleted";
+            }
+                          
+           
             countInserted = pstm.executeUpdate();
             System.out.println(countInserted+" row affected.");
         
@@ -90,6 +121,16 @@ public class Add_items extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
+        item_arr[0] = item_id;
+        item_arr[1] = item_name;
+        item_arr[2] = item_price;
+        item_arr[4] = String.valueOf(item_qnt);
+        item_arr[5] = String.valueOf(item_category);
+        //item_arr[6] = item_address;
+        item_arr[6] = countInserted + " records "+op+".\n";
+        item_arr[7] = "\n "+op+" successful";
+
+        JOptionPane.showMessageDialog(this, item_arr);
           
     }
     
@@ -259,6 +300,11 @@ public class Add_items extends javax.swing.JFrame {
         item_btn_delete.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         item_btn_delete.setText("Delete item");
         item_btn_delete.setName("item_btn_delete"); // NOI18N
+        item_btn_delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                item_btn_deleteActionPerformed(evt);
+            }
+        });
 
         item_btn_reset.setBackground(new java.awt.Color(255, 204, 102));
         item_btn_reset.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
@@ -282,7 +328,7 @@ public class Add_items extends javax.swing.JFrame {
         });
 
         jLabel1.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
-        jLabel1.setText("*use id of item to to search ");
+        jLabel1.setText("*use id of item to search records then Edit and Delete ");
 
         javax.swing.GroupLayout item_p2Layout = new javax.swing.GroupLayout(item_p2);
         item_p2.setLayout(item_p2Layout);
@@ -301,7 +347,7 @@ public class Add_items extends javax.swing.JFrame {
                             .addComponent(item_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(item_txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
                         .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(item_lbl_Qnt)
                             .addComponent(item_lbl_category))
@@ -323,10 +369,8 @@ public class Add_items extends javax.swing.JFrame {
                         .addComponent(item_btn_edit)
                         .addGap(71, 71, 71)
                         .addComponent(item_btn_delete))
-                    .addGroup(item_p2Layout.createSequentialGroup()
-                        .addGap(149, 149, 149)
-                        .addComponent(jLabel1)))
-                .addGap(24, 24, 24))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(43, 43, 43))
         );
         item_p2Layout.setVerticalGroup(
             item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -347,9 +391,9 @@ public class Add_items extends javax.swing.JFrame {
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(item_lbl_price, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 99, Short.MAX_VALUE)
-                .addComponent(jLabel1)
-                .addGap(64, 64, 64)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40)
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(item_btn_reset)
                     .addComponent(item_btn_add)
@@ -366,6 +410,7 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.getAccessibleContext().setAccessibleName("Item Quantity");
         item_dropdown_category.getAccessibleContext().setAccessibleName("Item category");
         item_btn_edit.getAccessibleContext().setAccessibleName("item edit");
+        jLabel1.getAccessibleContext().setAccessibleName("*for Edit and Delete use id of item to search ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -433,7 +478,7 @@ public class Add_items extends javax.swing.JFrame {
 //            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
 //            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
               String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
-              get_data(sqlInsert);
+              set_data(sqlInsert,0);
 //            
 //            
 //            pstm = c.prepareStatement(sqlInsert);
@@ -469,13 +514,14 @@ public class Add_items extends javax.swing.JFrame {
 //        item_arr[7] = "\n Records inserted successfully";
 //
 //        JOptionPane.showMessageDialog(this, item_arr);
-//
+
         
     }//GEN-LAST:event_item_btn_addActionPerformed
 
     private void item_btn_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_editActionPerformed
         // TODO add your handling code here:
-        
+        String sqlquery = "update `item_master` set name= ?,Quantity = ?,category_id= ?,price= ? where item_code=?";
+        set_data(sqlquery,1);
     }//GEN-LAST:event_item_btn_editActionPerformed
 
     private void item_btn_dashbdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_dashbdActionPerformed
@@ -508,7 +554,7 @@ public class Add_items extends javax.swing.JFrame {
             PreparedStatement psmt = c.prepareStatement(query);
             psmt.setInt(1,id);
             ResultSet rs = psmt.executeQuery();
-            //int temp=0;
+            
             while(rs.next()){
                 //temp=temp+1;
                 item_code = rs.getInt("item_code");
@@ -519,10 +565,11 @@ public class Add_items extends javax.swing.JFrame {
                 
                
             }
+            
+            // Function that fill form from database record data... 
             set_fields(item_code, name, Quantity, category_id, price);
             
-            //JOptionPane.showMessageDialog(this, temp);
-
+            
             
         }
         catch(Exception e){
@@ -535,6 +582,12 @@ public class Add_items extends javax.swing.JFrame {
         }
         
     }//GEN-LAST:event_item_btn_searchActionPerformed
+
+    private void item_btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_deleteActionPerformed
+        // TODO add your handling code here:
+        String query = "delete from item_master where item_code=?";
+        set_data(query,2);
+    }//GEN-LAST:event_item_btn_deleteActionPerformed
 
     /**
      * @param args the command line arguments

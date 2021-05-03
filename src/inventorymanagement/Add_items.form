@@ -182,7 +182,7 @@
                               <Component id="item_txt_price" alignment="0" min="-2" pref="214" max="-2" attributes="0"/>
                               <Component id="item_txt_id" min="-2" pref="214" max="-2" attributes="0"/>
                           </Group>
-                          <EmptySpace max="32767" attributes="0"/>
+                          <EmptySpace pref="64" max="32767" attributes="0"/>
                           <Group type="103" groupAlignment="0" attributes="0">
                               <Component id="item_lbl_Qnt" min="-2" max="-2" attributes="0"/>
                               <Component id="item_lbl_category" min="-2" max="-2" attributes="0"/>
@@ -210,12 +210,9 @@
                           <EmptySpace min="-2" pref="71" max="-2" attributes="0"/>
                           <Component id="item_btn_delete" min="-2" max="-2" attributes="0"/>
                       </Group>
-                      <Group type="102" alignment="0" attributes="0">
-                          <EmptySpace min="-2" pref="149" max="-2" attributes="0"/>
-                          <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                      </Group>
+                      <Component id="jLabel1" min="-2" pref="265" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace min="-2" pref="24" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="43" max="-2" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -241,9 +238,9 @@
                       <Component id="item_txt_price" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="item_lbl_price" alignment="3" min="-2" pref="34" max="-2" attributes="0"/>
                   </Group>
-                  <EmptySpace pref="99" max="32767" attributes="0"/>
-                  <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace min="-2" pref="64" max="-2" attributes="0"/>
+                  <EmptySpace pref="108" max="32767" attributes="0"/>
+                  <Component id="jLabel1" min="-2" pref="28" max="-2" attributes="0"/>
+                  <EmptySpace min="-2" pref="40" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="item_btn_reset" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="item_btn_add" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -412,6 +409,9 @@
             <Property name="text" type="java.lang.String" value="Delete item"/>
             <Property name="name" type="java.lang.String" value="item_btn_delete" noResource="true"/>
           </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="item_btn_deleteActionPerformed"/>
+          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="item_btn_reset">
           <Properties>
@@ -452,8 +452,11 @@
             <Property name="font" type="java.awt.Font" editor="org.netbeans.beaninfo.editors.FontEditor">
               <Font name="Dialog" size="10" style="0"/>
             </Property>
-            <Property name="text" type="java.lang.String" value="*use id of item to to search "/>
+            <Property name="text" type="java.lang.String" value="*use id of item to search records then Edit and Delete "/>
           </Properties>
+          <AccessibilityProperties>
+            <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="*for Edit and Delete use id of item to search "/>
+          </AccessibilityProperties>
         </Component>
       </SubComponents>
     </Container>
