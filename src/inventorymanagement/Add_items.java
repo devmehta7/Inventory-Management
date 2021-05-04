@@ -23,6 +23,38 @@ public class Add_items extends javax.swing.JFrame {
 
     public Add_items() {
         initComponents();
+
+        try{
+
+            c = Conn.setConnect();
+            statement = c.createStatement();
+
+            String query = "SELECT name FROM `Category`";
+            rs = statement.executeQuery(query);
+
+            while(rs.next())
+            {
+                item_dropdown_category.addItem(rs.getString("name"));
+            }
+
+        }
+        catch(SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                c.close();
+            }
+            catch(SQLException ex)
+            {
+              ex.printStackTrace();
+            }
+        }
+
+
     }
     // global variables...
     int item_code;
@@ -32,27 +64,29 @@ public class Add_items extends javax.swing.JFrame {
     int Quantity;
 
     Connection c;
+    Statement statement;
+    ResultSet rs;
     PreparedStatement pstm = null;
     // functions
-    
+
     //Sets variable data to text fields....
     void set_fields(int id,String name,int quantity,int category,double price){
         item_txt_id.setText(String.valueOf(id));
         item_txt_name.setText(name);
         item_txt_price.setText(String.valueOf(price));
         item_spinner_qnt.setValue(quantity);
-        item_dropdown_category.setSelectedIndex(category);   
+        item_dropdown_category.setSelectedIndex(category);
     }
-    
+
     // clear every text fields....
     void reset_fields(){
         item_txt_id.setText("");
         item_txt_name.setText("");
         item_txt_price.setText("");
         item_dropdown_category.setSelectedIndex(0);
-        item_spinner_qnt.setValue(0);     
+        item_spinner_qnt.setValue(0);
     }
-    
+
     // function to get all textfeilds data to database....
     void set_data(String query,int operation){
         // variables for dialog box...
@@ -65,14 +99,14 @@ public class Add_items extends javax.swing.JFrame {
         //String item_category = item_dropdown_category.getSelectedItem()
         Object item_qnt;
         item_qnt = item_spinner_qnt.getValue();
-        
+
         String op = null;
         // main operation...
         try{
-                    
+
             c=Conn.setConnect();
-            
-            // assigning form values to variables..  
+
+            // assigning form values to variables..
             item_code = Integer.parseInt(item_txt_id.getText());
             name = item_txt_name.getText();
             Object item_qnt1;
@@ -80,10 +114,10 @@ public class Add_items extends javax.swing.JFrame {
             Quantity = Integer.parseInt(String.valueOf(item_qnt1));
             category_id = item_dropdown_category.getSelectedIndex();
             price = Double.parseDouble(item_txt_price.getText());
-            
+
             pstm = c.prepareStatement(query);
-            
-            // checking the type of operation(insert,update,delete)... 
+
+            // checking the type of operation(insert,update,delete)...
             if (operation== 0){
                 pstm.setInt(1, item_code);
                 pstm.setString(2, name);
@@ -104,11 +138,11 @@ public class Add_items extends javax.swing.JFrame {
                 pstm.setInt(1,item_code);
                 op="Deleted";
             }
-                          
-           
+
+
             countInserted = pstm.executeUpdate();
             System.out.println(countInserted+" row affected.");
-        
+
         }
         catch(Exception e){
             e.printStackTrace();
@@ -131,20 +165,20 @@ public class Add_items extends javax.swing.JFrame {
         item_arr[7] = "\n "+op+" successful";
 
         JOptionPane.showMessageDialog(this, item_arr);
-          
+
     }
-    
-    
+
+
     //database connentivity
 //    static final String DB_URL = "jdbc:mysql://localhost:3306/inventory";
 //    static final String DB_DRV = "com.mysql.jdbc.Driver";
 //    static final String DB_USER = "user1";
 //    static final String DB_PASSWD = "User1db@123";
 
-    
-//    
+
+//
 //  Statement stmt=null;
-    
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -268,7 +302,7 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.setName("item_spinner_qnt"); // NOI18N
 
         item_dropdown_category.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "select", "Electronics", "Grocery", "Pharmacy", "Medical", "Instrument", "others" }));
+        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "*create new" }));
         item_dropdown_category.setName("item_dropdown_category"); // NOI18N
         item_dropdown_category.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -479,15 +513,15 @@ public class Add_items extends javax.swing.JFrame {
 //            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
               String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
               set_data(sqlInsert,0);
-//            
-//            
+//
+//
 //            pstm = c.prepareStatement(sqlInsert);
 //            pstm.setInt(1, item_code);
 //            pstm.setString(2, name);
 //            pstm.setInt(3, Quantity);
 //            pstm.setInt(4, category_id);
 //            pstm.setDouble(5, price);
-//            
+//
 //            System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
 //            countInserted = pstm.executeUpdate();
 //            System.out.println(countInserted + " records inserted.\n");
@@ -515,7 +549,7 @@ public class Add_items extends javax.swing.JFrame {
 //
 //        JOptionPane.showMessageDialog(this, item_arr);
 
-        
+
     }//GEN-LAST:event_item_btn_addActionPerformed
 
     private void item_btn_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_editActionPerformed
@@ -535,6 +569,12 @@ public class Add_items extends javax.swing.JFrame {
 
     private void item_dropdown_categoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_dropdown_categoryActionPerformed
         // TODO add your handling code here:
+        if( item_dropdown_category.getSelectedIndex() == 0 )
+        {
+            Add_Category obj = new Add_Category();
+            obj.setVisible(true);
+            //setVisible(false);
+        }
     }//GEN-LAST:event_item_dropdown_categoryActionPerformed
 
     private void item_btn_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_resetActionPerformed
@@ -543,18 +583,18 @@ public class Add_items extends javax.swing.JFrame {
     }//GEN-LAST:event_item_btn_resetActionPerformed
 
     private void item_btn_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_searchActionPerformed
-       
-        
+
+
         // main operation...
         try{
             c=Conn.setConnect();
-            
+
             int id = Integer.parseInt(item_txt_id.getText());
             String query="select * from item_master where item_code=?";
             PreparedStatement psmt = c.prepareStatement(query);
             psmt.setInt(1,id);
-            ResultSet rs = psmt.executeQuery();
-            
+            rs = psmt.executeQuery();
+
             while(rs.next()){
                 //temp=temp+1;
                 item_code = rs.getInt("item_code");
@@ -562,15 +602,15 @@ public class Add_items extends javax.swing.JFrame {
                 name = rs.getString("name");
                 price=rs.getDouble("price");
                 Quantity = rs.getInt("Quantity");
-                
-               
+
+
             }
-            
-            // Function that fill form from database record data... 
+
+            // Function that fill form from database record data...
             set_fields(item_code, name, Quantity, category_id, price);
-            
-            
-            
+
+
+
         }
         catch(Exception e){
             e.printStackTrace();
@@ -578,9 +618,9 @@ public class Add_items extends javax.swing.JFrame {
         finally{
             try{c.close();}
             catch(Exception e){e.printStackTrace();}
-            
+
         }
-        
+
     }//GEN-LAST:event_item_btn_searchActionPerformed
 
     private void item_btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_deleteActionPerformed
@@ -596,7 +636,7 @@ public class Add_items extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {

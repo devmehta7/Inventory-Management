@@ -343,14 +343,8 @@
               <Font name="Times New Roman" size="14" style="1"/>
             </Property>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
-              <StringArray count="7">
-                <StringItem index="0" value="select"/>
-                <StringItem index="1" value="Electronics"/>
-                <StringItem index="2" value="Grocery"/>
-                <StringItem index="3" value="Pharmacy"/>
-                <StringItem index="4" value="Medical"/>
-                <StringItem index="5" value="Instrument"/>
-                <StringItem index="6" value="others"/>
+              <StringArray count="1">
+                <StringItem index="0" value="*create new"/>
               </StringArray>
             </Property>
             <Property name="name" type="java.lang.String" value="item_dropdown_category" noResource="true"/>
