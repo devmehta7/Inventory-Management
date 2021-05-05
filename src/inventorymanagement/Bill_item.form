@@ -179,9 +179,6 @@
             </Property>
             <Property name="text" type="java.lang.String" value="ADD"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bill1_btn_addActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JButton" name="bill1_btn_delete">
           <Properties>
@@ -267,9 +264,6 @@
               <TableHeader reorderingAllowed="true" resizingAllowed="true"/>
             </Property>
           </Properties>
-          <Events>
-            <EventHandler event="componentAdded" listener="java.awt.event.ContainerListener" parameters="java.awt.event.ContainerEvent" handler="bill1_tblComponentAdded"/>
-          </Events>
         </Component>
       </SubComponents>
     </Container>

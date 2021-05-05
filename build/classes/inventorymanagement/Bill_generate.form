@@ -252,9 +252,6 @@
             </Property>
             <Property name="text" type="java.lang.String" value="ADD"/>
           </Properties>
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bill2_btn_addActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="bill2_txt_custNm">
           <Properties>

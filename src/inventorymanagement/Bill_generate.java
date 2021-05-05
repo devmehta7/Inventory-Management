@@ -5,12 +5,6 @@
  */
 package inventorymanagement;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.sql.SQLException;
-import javax.swing.JOptionPane;
 /**
  *
  * @author admin
@@ -20,73 +14,10 @@ public class Bill_generate extends javax.swing.JFrame {
     /**
      * Creates new form bill_generate
      */
-    
-   //global variable declarations
-    Connection conn = null;
-    Statement stmt = null;
-    PreparedStatement pstm = null;
-    
     public Bill_generate() {
         initComponents();
     }
 
-    void insert_data(String query){
-        
-        // variables for dialog box...
-        String[] item_arr = new String[3];
-        
-        int countInserted = 0;
-
-        //getting the form values into local variable
-        String cus_name = bill2_txt_custNm.getText();
-        String cus_mobno = bill2_txt_mobileNo.getText();
-        
-        String op = null;
-        // main operation...
-        try{
-
-            conn=Conn.setConnect();
-
-            // assigning form values to variables..
-            
-            pstm = conn.prepareStatement(query);
-
-            // checking the type of operation(insert,update,delete)...
-            
-                pstm.setString(1, cus_name);
-                pstm.setString(2, cus_mobno);
-                op="Inserted";
-            
-            countInserted = pstm.executeUpdate();
-            System.out.println(countInserted+" row affected.");
-
-                
-        }catch(SQLException e)
-        {
-            e.printStackTrace();
-        }
-        finally
-        {
-            try{
-                conn.close();
-            }
-            catch(SQLException e)
-            {
-                e.printStackTrace();
-            }
-            
-        }
-        
-        
-        item_arr[0] = cus_name;
-        item_arr[1] = cus_mobno;
-        item_arr[2] = countInserted + " records Inserted successfully";
-        
-        JOptionPane.showMessageDialog(this, item_arr);
-
-        
-    }
-    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -198,11 +129,6 @@ public class Bill_generate extends javax.swing.JFrame {
         bill2_btn_add.setBackground(new java.awt.Color(255, 255, 153));
         bill2_btn_add.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         bill2_btn_add.setText("ADD");
-        bill2_btn_add.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bill2_btn_addActionPerformed(evt);
-            }
-        });
 
         bill2_txt_custNm.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
 
@@ -288,15 +214,6 @@ public class Bill_generate extends javax.swing.JFrame {
         setVisible(false);
         
     }//GEN-LAST:event_bill2_btn_dashbdActionPerformed
-
-    private void bill2_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill2_btn_addActionPerformed
-        // TODO add your handling code here:
-        
-               String sqlInsert = "INSERT INTO `customer_master` (name,contact) VALUES (?,?)";
-              insert_data(sqlInsert);
-// 
-        
-    }//GEN-LAST:event_bill2_btn_addActionPerformed
 
     /**
      * @param args the command line arguments
