@@ -353,6 +353,10 @@
             <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Item category"/>
           </AccessibilityProperties>
           <Events>
+<<<<<<< HEAD
+            <EventHandler event="itemStateChanged" listener="java.awt.event.ItemListener" parameters="java.awt.event.ItemEvent" handler="item_dropdown_categoryItemStateChanged"/>
+=======
+>>>>>>> b49005a1993645aa5cbacb41bc86f5b1e94cc592
             <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="item_dropdown_categoryFocusGained"/>
             <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="item_dropdown_categoryMouseClicked"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="item_dropdown_categoryActionPerformed"/>

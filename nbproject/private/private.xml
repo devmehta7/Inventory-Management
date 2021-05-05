@@ -3,7 +3,11 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
+<<<<<<< HEAD
+            <file>file:/home/dev/NetBeansProjects/InventoryManagement/src/inventorymanagement/Add_items.java</file>
+=======
             <file>file:/C:/Users/admin/Desktop/Education/java/1.%20Project/github/InventoryManagement-master/src/inventorymanagement/Add_items.java</file>
+>>>>>>> b49005a1993645aa5cbacb41bc86f5b1e94cc592
         </group>
     </open-files>
 </project-private>
