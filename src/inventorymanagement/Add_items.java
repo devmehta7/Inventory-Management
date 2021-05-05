@@ -353,6 +353,7 @@ public class Add_items extends javax.swing.JFrame {
         item_lbl_price.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         item_lbl_price.setText("Price");
 
+        item_btn_search.setBackground(new java.awt.Color(255, 204, 102));
         item_btn_search.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         item_btn_search.setText("Search");
         item_btn_search.addActionListener(new java.awt.event.ActionListener() {
