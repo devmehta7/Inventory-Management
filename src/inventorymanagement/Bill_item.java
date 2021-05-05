@@ -5,6 +5,14 @@
  */
 package inventorymanagement;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author admin
@@ -14,6 +22,18 @@ public class Bill_item extends javax.swing.JFrame {
     /**
      * Creates new form bill_item
      */
+    
+    Connection  conn = null;
+    Statement stmt = null;
+    ResultSet rs= null;
+    DefaultTableModel tblobj = new DefaultTableModel();
+    static int SrNo = 0;
+    static String arr[][] = new String[6][6];
+    double gettotal = 0.0;
+    double grandtotal = 0.0;
+    int qnt = 0;
+   
+    
     public Bill_item() {
         initComponents();
     }
@@ -36,6 +56,8 @@ public class Bill_item extends javax.swing.JFrame {
         bill1_btn_delete = new javax.swing.JButton();
         bill1_txt_itemId = new javax.swing.JTextField();
         bill1_txt_Qnt = new javax.swing.JTextField();
+        bill1_lbl_gtotal = new javax.swing.JLabel();
+        bill1_lbl_gtotalval = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         bill1_tbl = new javax.swing.JTable();
         bill1_p3 = new javax.swing.JPanel();
@@ -79,6 +101,11 @@ public class Bill_item extends javax.swing.JFrame {
         bill1_btn_add.setBackground(new java.awt.Color(255, 255, 153));
         bill1_btn_add.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         bill1_btn_add.setText("ADD");
+        bill1_btn_add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bill1_btn_addActionPerformed(evt);
+            }
+        });
 
         bill1_btn_delete.setBackground(new java.awt.Color(255, 255, 153));
         bill1_btn_delete.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
@@ -88,27 +115,40 @@ public class Bill_item extends javax.swing.JFrame {
 
         bill1_txt_Qnt.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
 
+        bill1_lbl_gtotal.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
+        bill1_lbl_gtotal.setText("Grand Total: - ");
+
+        bill1_lbl_gtotalval.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
+        bill1_lbl_gtotalval.setText("0.0");
+
         javax.swing.GroupLayout bill1_p2Layout = new javax.swing.GroupLayout(bill1_p2);
         bill1_p2.setLayout(bill1_p2Layout);
         bill1_p2Layout.setHorizontalGroup(
             bill1_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, bill1_p2Layout.createSequentialGroup()
+            .addGroup(bill1_p2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(bill1_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(bill1_p2Layout.createSequentialGroup()
-                        .addGap(0, 0, Short.MAX_VALUE)
-                        .addComponent(bill1_btn_delete)
-                        .addGap(18, 18, 18)
-                        .addComponent(bill1_btn_add))
+                        .addGroup(bill1_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(bill1_p2Layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(bill1_btn_delete)
+                                .addGap(18, 18, 18)
+                                .addComponent(bill1_btn_add))
+                            .addGroup(bill1_p2Layout.createSequentialGroup()
+                                .addComponent(bill1_lbl_itemId)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
+                                .addComponent(bill1_txt_itemId, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(bill1_p2Layout.createSequentialGroup()
+                                .addComponent(bill1_lbl_qnt)
+                                .addGap(18, 18, 18)
+                                .addComponent(bill1_txt_Qnt)))
+                        .addGap(31, 31, 31))
                     .addGroup(bill1_p2Layout.createSequentialGroup()
-                        .addComponent(bill1_lbl_itemId)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-                        .addComponent(bill1_txt_itemId, javax.swing.GroupLayout.PREFERRED_SIZE, 140, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(bill1_p2Layout.createSequentialGroup()
-                        .addComponent(bill1_lbl_qnt)
-                        .addGap(18, 18, 18)
-                        .addComponent(bill1_txt_Qnt)))
-                .addGap(31, 31, 31))
+                        .addComponent(bill1_lbl_gtotal)
+                        .addGap(39, 39, 39)
+                        .addComponent(bill1_lbl_gtotalval)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         bill1_p2Layout.setVerticalGroup(
             bill1_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -125,7 +165,11 @@ public class Bill_item extends javax.swing.JFrame {
                 .addGroup(bill1_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bill1_btn_add)
                     .addComponent(bill1_btn_delete))
-                .addContainerGap(103, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 78, Short.MAX_VALUE)
+                .addGroup(bill1_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bill1_lbl_gtotal)
+                    .addComponent(bill1_lbl_gtotalval))
+                .addContainerGap())
         );
 
         bill1_tbl.setBackground(new java.awt.Color(204, 255, 204));
@@ -153,6 +197,11 @@ public class Bill_item extends javax.swing.JFrame {
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+        });
+        bill1_tbl.addContainerListener(new java.awt.event.ContainerAdapter() {
+            public void componentAdded(java.awt.event.ContainerEvent evt) {
+                bill1_tblComponentAdded(evt);
             }
         });
         jScrollPane1.setViewportView(bill1_tbl);
@@ -247,6 +296,121 @@ public class Bill_item extends javax.swing.JFrame {
         
     }//GEN-LAST:event_bill1_btn_nextActionPerformed
 
+    private void bill1_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill1_btn_addActionPerformed
+        // TODO add your handling code here:
+        
+        tblobj = new DefaultTableModel();
+       bill1_tbl.setModel(tblobj);
+       
+       //String arr[][] = new String[5][5];
+       
+       tblobj.addColumn("Sr No.");//,"Product Name","Quantity","Amount","Total");
+       tblobj.addColumn("item_code");
+       tblobj.addColumn("Product Name");
+       tblobj.addColumn("Quantity");
+       tblobj.addColumn("Amount");
+       tblobj.addColumn("Total");
+       
+        System.out.println("Sr no " + SrNo);
+        
+        conn = Conn.setConnect();
+        
+        String product_name = null;
+        int item_code = 0;
+        double amount = 0.0;
+        int qnttxt = Integer.parseInt(bill1_txt_Qnt.getText());
+        double totalamt;
+        int qntdb = 0;// minus operation
+        
+        
+        int item_id = Integer.parseInt(bill1_txt_itemId.getText());
+        String query = "SELECT item_code,name,Quantity,price from `item_master` WHERE item_code="+item_id;
+        System.out.println(query);
+        
+        
+        
+        try {
+            conn = Conn.setConnect();
+            stmt = conn.createStatement();
+            
+            rs = stmt.executeQuery(query);
+            
+            //name, Quantity, Price;
+            //Sr no, Product name, quantity, amount, total;
+            while(rs.next())
+            {
+                item_code = rs.getInt("item_code");
+                product_name = rs.getString("name");
+                qntdb = rs.getInt("Quantity");
+                amount = rs.getDouble("price");
+                //tblobj.addRow(new Object[] {10,rs.getString("name"),Integer.parseInt(bill1_txt_Qnt.getText()),rs.getDouble("price"),});
+            }
+        
+        
+        } catch (SQLException ex) {
+            Logger.getLogger(Bill_item.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        totalamt = qnttxt * amount;//total = qnt * amount
+        
+       
+       //tblobj.insertRow(0, new Object[] { "1", "Parlege" });
+       //tblobj.insertRow(1, new Object[] {"parle G "} );
+        
+       //tblobj.addRow(new Object[] {10,"demo","18652"});
+    
+       arr[SrNo][0] = String.valueOf(SrNo);
+       arr[SrNo][1] = String.valueOf(product_name);
+       arr[SrNo][2] = String.valueOf(qnttxt);
+       arr[SrNo][3] = String.valueOf(amount);
+       arr[SrNo][4] = String.valueOf(totalamt);
+       arr[SrNo][5] = String.valueOf(item_code);        
+        
+       /*
+       for(int i=0;i<SrNo+1;i++)
+        {
+            for(int j=0;j<5;j++)
+            {
+                System.out.print(arr[i][j]);
+            }
+        }
+       */
+       
+       for(int i=0;i<SrNo+1;i++)
+       {
+           totalamt = qnttxt * amount;//total = qnt * amount
+           //tblobj.insertRow(i, new Object[] {SrNo,product_name,qnttxt,amount,totalamt});
+           tblobj.insertRow(i, new Object[] {arr[i][0],arr[i][1],arr[i][2],arr[i][3],arr[i][4]});
+           gettotal = Double.parseDouble(arr[i][4]);
+       }
+       grandtotal = grandtotal + gettotal;
+       bill1_lbl_gtotalval.setText(String.valueOf(grandtotal));
+        //System.out.println("Grand total = " +grandtotal);
+       SrNo++;
+       
+       
+       //tblobj.addRow(new Object[] {++SrNo,product_name,qnttxt,amount,totalamt});
+       //tblobj.insertRow(0, new Object[] {SrNo,product_name,qnttxt,amount,totalamt});
+       //tblobj.insertRow(1, new Object[] {SrNo,product_name,qnttxt,amount,totalamt});
+       
+       
+    }//GEN-LAST:event_bill1_btn_addActionPerformed
+
+    
+    String[][] gettable()
+    {        
+        return arr;
+    }
+    
+    
+    
+    private void bill1_tblComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_bill1_tblComponentAdded
+        // TODO add your handling code here:
+        
+        
+        
+    }//GEN-LAST:event_bill1_tblComponentAdded
+
     /**
      * @param args the command line arguments
      */
@@ -280,6 +444,30 @@ public class Bill_item extends javax.swing.JFrame {
         //</editor-fold>
         //</editor-fold>
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -294,6 +482,8 @@ public class Bill_item extends javax.swing.JFrame {
     private javax.swing.JButton bill1_btn_cancel;
     private javax.swing.JButton bill1_btn_delete;
     private javax.swing.JButton bill1_btn_next;
+    private javax.swing.JLabel bill1_lbl_gtotal;
+    private javax.swing.JLabel bill1_lbl_gtotalval;
     private javax.swing.JLabel bill1_lbl_itemId;
     private javax.swing.JLabel bill1_lbl_qnt;
     private javax.swing.JLabel bill1_lbl_title;

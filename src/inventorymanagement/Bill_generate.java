@@ -9,15 +9,103 @@ package inventorymanagement;
  *
  * @author admin
  */
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
+
 public class Bill_generate extends javax.swing.JFrame {
 
     /**
      * Creates new form bill_generate
      */
+    
+    Connection conn = null;
+    Statement stmt = null;
+    PreparedStatement pstm = null;
+    ResultSet rs = null;
+
+    String cus_name = "";
+    String cus_mobno = "";
+    int cus_id = 0;
+    int counter = 0;
+    
     public Bill_generate() {
         initComponents();
     }
+    
+    void getdata()
+    {
+        cus_name = bill2_txt_custNm.getText();
+        cus_mobno = bill2_txt_mobileNo.getText();
+        
+    }
 
+    
+    void insert_data(String query){
+        
+        // variables for dialog box...
+        String[] item_arr = new String[3];
+        
+        int countInserted = 0;
+
+        //getting the form values into local variable
+        cus_name = bill2_txt_custNm.getText();
+        cus_mobno = bill2_txt_mobileNo.getText();
+        
+        String op = null;
+        // main operation...
+        try{
+
+            conn=Conn.setConnect();
+
+            // assigning form values to variables..
+            
+            pstm = conn.prepareStatement(query);
+
+            // checking the type of operation(insert,update,delete)...
+            
+                pstm.setString(1, cus_name);
+                pstm.setString(2, cus_mobno);
+                op="Inserted";
+            
+            countInserted = pstm.executeUpdate();
+            System.out.println(countInserted+" row affected.");
+
+                
+        }catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try{
+                conn.close();
+            }
+            catch(SQLException e)
+            {
+                e.printStackTrace();
+            }
+            
+        }
+        
+        
+        item_arr[0] = cus_name;
+        item_arr[1] = cus_mobno;
+        item_arr[2] = countInserted + " records Inserted successfully";
+        
+        JOptionPane.showMessageDialog(this, item_arr);
+        
+    }
+    
+
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -81,6 +169,11 @@ public class Bill_generate extends javax.swing.JFrame {
         bill2_btn_billgenerate.setBackground(new java.awt.Color(255, 255, 204));
         bill2_btn_billgenerate.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         bill2_btn_billgenerate.setText("Generate Bill");
+        bill2_btn_billgenerate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bill2_btn_billgenerateActionPerformed(evt);
+            }
+        });
 
         bill2_btn_dashbd.setBackground(new java.awt.Color(255, 255, 204));
         bill2_btn_dashbd.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
@@ -129,6 +222,11 @@ public class Bill_generate extends javax.swing.JFrame {
         bill2_btn_add.setBackground(new java.awt.Color(255, 255, 153));
         bill2_btn_add.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
         bill2_btn_add.setText("ADD");
+        bill2_btn_add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bill2_btn_addActionPerformed(evt);
+            }
+        });
 
         bill2_txt_custNm.setFont(new java.awt.Font("Times New Roman", 1, 18)); // NOI18N
 
@@ -214,6 +312,116 @@ public class Bill_generate extends javax.swing.JFrame {
         setVisible(false);
         
     }//GEN-LAST:event_bill2_btn_dashbdActionPerformed
+
+    private void bill2_btn_billgenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill2_btn_billgenerateActionPerformed
+        // TODO add your handling code here:
+
+        Bill_item billitem = new Bill_item();
+        //DefaultTableModel tbl =  billitem.getmodel();
+        String arr[][] =  Bill_item.arr;
+        
+        
+        try
+        {
+            String insquery = "INSERT INTO `billing_transaction` (bill_id,item_id,cus_id,Quantity,total) VALUES (?,?,?,?,?)";
+                  
+            
+            conn = Conn.setConnect();
+            
+            pstm = conn.prepareStatement(insquery);
+          
+            for(int i=0;i<Bill_item.SrNo;i++)
+            {
+                for(int j=0;j<6;j++)
+                {
+                    
+                    System.out.print(" "+arr[i][j]);
+                 
+                }
+                System.out.println("");
+            }
+
+        }
+        catch(SQLException e)
+        {
+            e.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+        
+        
+        
+        
+        
+        //database operations
+        
+        
+        
+    }//GEN-LAST:event_bill2_btn_billgenerateActionPerformed
+
+    private void bill2_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill2_btn_addActionPerformed
+        // TODO add your handling code here:
+        
+        //if(co)
+        
+        getdata();
+        
+            String slqry = "SELECT id FROM `customer_master` WHERE name=? AND contact=?";
+            
+            System.out.println(slqry);
+          
+            
+            
+        try 
+        {
+            conn = Conn.setConnect();
+            
+            pstm = conn.prepareStatement(slqry);
+            pstm.setString(1, cus_name);
+            pstm.setString(2, cus_mobno);
+            rs = pstm.executeQuery(slqry);
+            
+            while(rs.next())
+            {
+                counter = 1;
+                cus_id = rs.getInt("id");
+            }
+
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Bill_generate.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally
+        {
+            try
+            {
+                conn.close();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+                       
+        if(counter == 0)
+        {
+            String sqlInsert = "INSERT INTO `customer_master` (name,contact) VALUES (?,?)";
+            insert_data(sqlInsert);
+
+        }
+            
+        
+              
+    }//GEN-LAST:event_bill2_btn_addActionPerformed
 
     /**
      * @param args the command line arguments
