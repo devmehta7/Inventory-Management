@@ -23,7 +23,25 @@ public class Add_items extends javax.swing.JFrame {
 
     public Add_items() {
         initComponents();
+        loadCategory();
 
+    }
+    // global variables...
+    int item_code;
+    String name;
+    double price;
+    int category_id;
+    int Quantity;
+
+    Connection c;
+    Statement statement;
+    ResultSet rs;
+    PreparedStatement pstm = null;
+    // functions
+
+    
+    void loadCategory()
+    {
         try{
 
             c = Conn.setConnect();
@@ -54,21 +72,8 @@ public class Add_items extends javax.swing.JFrame {
             }
         }
 
-
     }
-    // global variables...
-    int item_code;
-    String name;
-    double price;
-    int category_id;
-    int Quantity;
-
-    Connection c;
-    Statement statement;
-    ResultSet rs;
-    PreparedStatement pstm = null;
-    // functions
-
+    
     //Sets variable data to text fields....
     void set_fields(int id,String name,int quantity,int category,double price){
         item_txt_id.setText(String.valueOf(id));
@@ -302,8 +307,23 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.setName("item_spinner_qnt"); // NOI18N
 
         item_dropdown_category.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "*create new" }));
+        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "** Create New **" }));
         item_dropdown_category.setName("item_dropdown_category"); // NOI18N
+        item_dropdown_category.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                item_dropdown_categoryItemStateChanged(evt);
+            }
+        });
+        item_dropdown_category.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                item_dropdown_categoryFocusGained(evt);
+            }
+        });
+        item_dropdown_category.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                item_dropdown_categoryMouseClicked(evt);
+            }
+        });
         item_dropdown_category.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 item_dropdown_categoryActionPerformed(evt);
@@ -353,6 +373,7 @@ public class Add_items extends javax.swing.JFrame {
         item_lbl_price.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         item_lbl_price.setText("Price");
 
+        item_btn_search.setBackground(new java.awt.Color(255, 204, 102));
         item_btn_search.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         item_btn_search.setText("Search");
         item_btn_search.addActionListener(new java.awt.event.ActionListener() {
@@ -420,7 +441,7 @@ public class Add_items extends javax.swing.JFrame {
                     .addComponent(item_lbl_name)
                     .addComponent(item_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(item_lbl_category)
-                    .addComponent(item_dropdown_category, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(item_dropdown_category))
                 .addGap(56, 56, 56)
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -477,77 +498,9 @@ public class Add_items extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void item_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_addActionPerformed
-//        String[] item_arr = new String[8];
-//        int countInserted = 0;
-//        String item_id = item_txt_id.getText();
-//        String item_name = item_txt_name.getText();
-//        String item_price = item_txt_price.getText();
-//        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
-//        //String item_category = item_dropdown_category.getSelectedItem()
-//        Object item_qnt;
-//        item_qnt = item_spinner_qnt.getValue();
-//
-//        item_code = Integer.parseInt(item_txt_id.getText());
-//        System.out.println("id " + item_code);
-//
-//        name = item_txt_name.getText();
-//        System.out.println("name " + name);
-//
-//        Object item_qnt1;
-//        item_qnt1 = item_spinner_qnt.getValue();
-//        Quantity = Integer.parseInt(String.valueOf(item_qnt1));
-//        System.out.println("Quantity " + Quantity);
-//
-//        category_id = item_dropdown_category.getSelectedIndex();
-//        System.out.println("category " + category_id);
-//
-//        price = Double.parseDouble(item_txt_price.getText());
-//        System.out.println("price " + price);
-//
-//        try {
-//
-//            c=Conn.setConnect();
-//           //statement = connection.createStatement();
-//
-//            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
-//            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
-              String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
-              set_data(sqlInsert,0);
-//
-//
-//            pstm = c.prepareStatement(sqlInsert);
-//            pstm.setInt(1, item_code);
-//            pstm.setString(2, name);
-//            pstm.setInt(3, Quantity);
-//            pstm.setInt(4, category_id);
-//            pstm.setDouble(5, price);
-//
-//            System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
-//            countInserted = pstm.executeUpdate();
-//            System.out.println(countInserted + " records inserted.\n");
-//
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        } finally {
-//            try {
-//                c.close();
-//                //statement.close();
-//            } catch (SQLException ex) {
-//                Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//
-//        }
-//
-//        item_arr[0] = item_id;
-//        item_arr[1] = item_name;
-//        item_arr[2] = item_price;
-//        item_arr[4] = String.valueOf(item_qnt);
-//        item_arr[5] = String.valueOf(item_category);
-//        //item_arr[6] = item_address;
-//        item_arr[6] = countInserted + " records inserted.\n";
-//        item_arr[7] = "\n Records inserted successfully";
-//
-//        JOptionPane.showMessageDialog(this, item_arr);
+
+        String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
+        set_data(sqlInsert,0);
 
 
     }//GEN-LAST:event_item_btn_addActionPerformed
@@ -569,6 +522,8 @@ public class Add_items extends javax.swing.JFrame {
 
     private void item_dropdown_categoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_dropdown_categoryActionPerformed
         // TODO add your handling code here:
+        //loadCategory();
+        
         if( item_dropdown_category.getSelectedIndex() == 0 )
         {
             Add_Category obj = new Add_Category();
@@ -628,6 +583,22 @@ public class Add_items extends javax.swing.JFrame {
         String query = "delete from item_master where item_code=?";
         set_data(query,2);
     }//GEN-LAST:event_item_btn_deleteActionPerformed
+
+    private void item_dropdown_categoryFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_item_dropdown_categoryFocusGained
+        // TODO add your handling code here:
+        //loadCategory();
+        
+    }//GEN-LAST:event_item_dropdown_categoryFocusGained
+
+    private void item_dropdown_categoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_item_dropdown_categoryMouseClicked
+        // TODO add your handling code here:
+        //loadCategory();
+    }//GEN-LAST:event_item_dropdown_categoryMouseClicked
+
+    private void item_dropdown_categoryItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_item_dropdown_categoryItemStateChanged
+        // TODO add your handling code here:
+        
+    }//GEN-LAST:event_item_dropdown_categoryItemStateChanged
 
     /**
      * @param args the command line arguments

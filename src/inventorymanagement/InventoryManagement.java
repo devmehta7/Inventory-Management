@@ -144,6 +144,11 @@ public class InventoryManagement extends javax.swing.JFrame {
         dashbd_rcenter_p4.setBackground(new java.awt.Color(255, 255, 204));
 
         dashbd_btn_bill.setText("Billing");
+        dashbd_btn_bill.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                dashbd_btn_billActionPerformed(evt);
+            }
+        });
 
         dashbd_btn_report.setText("Report");
 
@@ -234,6 +239,15 @@ public class InventoryManagement extends javax.swing.JFrame {
         setVisible(false);
         // TODO add your handling code here:
     }//GEN-LAST:event_dashbd_btn_orderActionPerformed
+
+    private void dashbd_btn_billActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_dashbd_btn_billActionPerformed
+        // TODO add your handling code here:
+        
+        Bill_item obj = new Bill_item();
+        obj.setVisible(true);
+        setVisible(false);
+        
+    }//GEN-LAST:event_dashbd_btn_billActionPerformed
 
     /**
      * @param args the command line arguments
