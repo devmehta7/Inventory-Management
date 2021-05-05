@@ -231,7 +231,7 @@
                       <Component id="item_lbl_name" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="item_txt_name" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="item_lbl_category" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="item_dropdown_category" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="item_dropdown_category" alignment="3" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace min="-2" pref="56" max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -344,7 +344,7 @@
             </Property>
             <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
               <StringArray count="1">
-                <StringItem index="0" value="*create new"/>
+                <StringItem index="0" value="** Create New **"/>
               </StringArray>
             </Property>
             <Property name="name" type="java.lang.String" value="item_dropdown_category" noResource="true"/>
@@ -353,6 +353,8 @@
             <Property name="AccessibleContext.accessibleName" type="java.lang.String" value="Item category"/>
           </AccessibilityProperties>
           <Events>
+            <EventHandler event="focusGained" listener="java.awt.event.FocusListener" parameters="java.awt.event.FocusEvent" handler="item_dropdown_categoryFocusGained"/>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="item_dropdown_categoryMouseClicked"/>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="item_dropdown_categoryActionPerformed"/>
           </Events>
           <AuxValues>

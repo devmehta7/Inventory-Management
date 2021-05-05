@@ -23,7 +23,25 @@ public class Add_items extends javax.swing.JFrame {
 
     public Add_items() {
         initComponents();
+        loadCategory();
 
+    }
+    // global variables...
+    int item_code;
+    String name;
+    double price;
+    int category_id;
+    int Quantity;
+
+    Connection c;
+    Statement statement;
+    ResultSet rs;
+    PreparedStatement pstm = null;
+    // functions
+
+    
+    void loadCategory()
+    {
         try{
 
             c = Conn.setConnect();
@@ -54,21 +72,8 @@ public class Add_items extends javax.swing.JFrame {
             }
         }
 
-
     }
-    // global variables...
-    int item_code;
-    String name;
-    double price;
-    int category_id;
-    int Quantity;
-
-    Connection c;
-    Statement statement;
-    ResultSet rs;
-    PreparedStatement pstm = null;
-    // functions
-
+    
     //Sets variable data to text fields....
     void set_fields(int id,String name,int quantity,int category,double price){
         item_txt_id.setText(String.valueOf(id));
@@ -302,8 +307,18 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.setName("item_spinner_qnt"); // NOI18N
 
         item_dropdown_category.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "*create new" }));
+        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "** Create New **" }));
         item_dropdown_category.setName("item_dropdown_category"); // NOI18N
+        item_dropdown_category.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                item_dropdown_categoryFocusGained(evt);
+            }
+        });
+        item_dropdown_category.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                item_dropdown_categoryMouseClicked(evt);
+            }
+        });
         item_dropdown_category.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 item_dropdown_categoryActionPerformed(evt);
@@ -421,7 +436,7 @@ public class Add_items extends javax.swing.JFrame {
                     .addComponent(item_lbl_name)
                     .addComponent(item_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(item_lbl_category)
-                    .addComponent(item_dropdown_category, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(item_dropdown_category))
                 .addGap(56, 56, 56)
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -570,6 +585,8 @@ public class Add_items extends javax.swing.JFrame {
 
     private void item_dropdown_categoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_dropdown_categoryActionPerformed
         // TODO add your handling code here:
+        //loadCategory();
+        
         if( item_dropdown_category.getSelectedIndex() == 0 )
         {
             Add_Category obj = new Add_Category();
@@ -629,6 +646,17 @@ public class Add_items extends javax.swing.JFrame {
         String query = "delete from item_master where item_code=?";
         set_data(query,2);
     }//GEN-LAST:event_item_btn_deleteActionPerformed
+
+    private void item_dropdown_categoryFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_item_dropdown_categoryFocusGained
+        // TODO add your handling code here:
+        //loadCategory();
+        
+    }//GEN-LAST:event_item_dropdown_categoryFocusGained
+
+    private void item_dropdown_categoryMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_item_dropdown_categoryMouseClicked
+        // TODO add your handling code here:
+        //loadCategory();
+    }//GEN-LAST:event_item_dropdown_categoryMouseClicked
 
     /**
      * @param args the command line arguments
