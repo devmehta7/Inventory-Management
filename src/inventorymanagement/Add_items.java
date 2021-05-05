@@ -8,7 +8,9 @@ package inventorymanagement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
@@ -19,22 +21,164 @@ import javax.swing.JOptionPane;
  */
 public class Add_items extends javax.swing.JFrame {
 
-    /**
-     * Creates new form Add_items
-     */
     public Add_items() {
         initComponents();
-    }
-    
-    //database connentivity
-    static final String DB_URL = "jdbc:mysql://localhost:3306/inventory";
-    static final String DB_DRV = "com.mysql.jdbc.Driver";
-    static final String DB_USER = "user1";
-    static final String DB_PASSWD = "User1db@123";
 
-    Connection connection = null;
-    //Statement statement = null;
+        try{
+
+            c = Conn.setConnect();
+            statement = c.createStatement();
+
+            String query = "SELECT name FROM `Category`";
+            rs = statement.executeQuery(query);
+
+            while(rs.next())
+            {
+                item_dropdown_category.addItem(rs.getString("name"));
+            }
+
+        }
+        catch(SQLException ex)
+        {
+            ex.printStackTrace();
+        }
+        finally
+        {
+            try
+            {
+                c.close();
+            }
+            catch(SQLException ex)
+            {
+              ex.printStackTrace();
+            }
+        }
+
+
+    }
+    // global variables...
+    int item_code;
+    String name;
+    double price;
+    int category_id;
+    int Quantity;
+
+    Connection c;
+    Statement statement;
+    ResultSet rs;
     PreparedStatement pstm = null;
+    // functions
+
+    //Sets variable data to text fields....
+    void set_fields(int id,String name,int quantity,int category,double price){
+        item_txt_id.setText(String.valueOf(id));
+        item_txt_name.setText(name);
+        item_txt_price.setText(String.valueOf(price));
+        item_spinner_qnt.setValue(quantity);
+        item_dropdown_category.setSelectedIndex(category);
+    }
+
+    // clear every text fields....
+    void reset_fields(){
+        item_txt_id.setText("");
+        item_txt_name.setText("");
+        item_txt_price.setText("");
+        item_dropdown_category.setSelectedIndex(0);
+        item_spinner_qnt.setValue(0);
+    }
+
+    // function to get all textfeilds data to database....
+    void set_data(String query,int operation){
+        // variables for dialog box...
+        String[] item_arr = new String[8];
+        int countInserted = 0;
+        String item_id = item_txt_id.getText();
+        String item_name = item_txt_name.getText();
+        String item_price = item_txt_price.getText();
+        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
+        //String item_category = item_dropdown_category.getSelectedItem()
+        Object item_qnt;
+        item_qnt = item_spinner_qnt.getValue();
+
+        String op = null;
+        // main operation...
+        try{
+
+            c=Conn.setConnect();
+
+            // assigning form values to variables..
+            item_code = Integer.parseInt(item_txt_id.getText());
+            name = item_txt_name.getText();
+            Object item_qnt1;
+            item_qnt1 = item_spinner_qnt.getValue();
+            Quantity = Integer.parseInt(String.valueOf(item_qnt1));
+            category_id = item_dropdown_category.getSelectedIndex();
+            price = Double.parseDouble(item_txt_price.getText());
+
+            pstm = c.prepareStatement(query);
+
+            // checking the type of operation(insert,update,delete)...
+            if (operation== 0){
+                pstm.setInt(1, item_code);
+                pstm.setString(2, name);
+                pstm.setInt(3, Quantity);
+                pstm.setInt(4, category_id);
+                pstm.setDouble(5, price);
+                op="Inserted";
+            }
+            else if (operation == 1){
+                pstm.setString(1, name);
+                pstm.setInt(2, Quantity);
+                pstm.setInt(3, category_id);
+                pstm.setDouble(4, price);
+                pstm.setInt(5, item_code);
+                op="Updated";
+            }
+            else if(operation == 2){
+                pstm.setInt(1,item_code);
+                op="Deleted";
+            }
+
+
+            countInserted = pstm.executeUpdate();
+            System.out.println(countInserted+" row affected.");
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            try{
+                c.close();
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        item_arr[0] = item_id;
+        item_arr[1] = item_name;
+        item_arr[2] = item_price;
+        item_arr[4] = String.valueOf(item_qnt);
+        item_arr[5] = String.valueOf(item_category);
+        //item_arr[6] = item_address;
+        item_arr[6] = countInserted + " records "+op+".\n";
+        item_arr[7] = "\n "+op+" successful";
+
+        JOptionPane.showMessageDialog(this, item_arr);
+
+    }
+
+
+    //database connentivity
+//    static final String DB_URL = "jdbc:mysql://localhost:3306/inventory";
+//    static final String DB_DRV = "com.mysql.jdbc.Driver";
+//    static final String DB_USER = "user1";
+//    static final String DB_PASSWD = "User1db@123";
+
+
+//
+//  Statement stmt=null;
+
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -63,6 +207,8 @@ public class Add_items extends javax.swing.JFrame {
         item_btn_delete = new javax.swing.JButton();
         item_btn_reset = new javax.swing.JButton();
         item_lbl_price = new javax.swing.JLabel();
+        item_btn_search = new javax.swing.JButton();
+        jLabel1 = new javax.swing.JLabel();
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -156,7 +302,7 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.setName("item_spinner_qnt"); // NOI18N
 
         item_dropdown_category.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
-        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "\" \"", "Electronics", "Grocery", "Pharmacy", "Medical", "Instrument", "others" }));
+        item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "*create new" }));
         item_dropdown_category.setName("item_dropdown_category"); // NOI18N
         item_dropdown_category.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -188,65 +334,77 @@ public class Add_items extends javax.swing.JFrame {
         item_btn_delete.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         item_btn_delete.setText("Delete item");
         item_btn_delete.setName("item_btn_delete"); // NOI18N
+        item_btn_delete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                item_btn_deleteActionPerformed(evt);
+            }
+        });
 
         item_btn_reset.setBackground(new java.awt.Color(255, 204, 102));
         item_btn_reset.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
         item_btn_reset.setText("Reset");
         item_btn_reset.setName("item_btn_reset"); // NOI18N
+        item_btn_reset.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                item_btn_resetActionPerformed(evt);
+            }
+        });
 
         item_lbl_price.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         item_lbl_price.setText("Price");
+
+        item_btn_search.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        item_btn_search.setText("Search");
+        item_btn_search.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                item_btn_searchActionPerformed(evt);
+            }
+        });
+
+        jLabel1.setFont(new java.awt.Font("Dialog", 0, 10)); // NOI18N
+        jLabel1.setText("*use id of item to search records then Edit and Delete ");
 
         javax.swing.GroupLayout item_p2Layout = new javax.swing.GroupLayout(item_p2);
         item_p2.setLayout(item_p2Layout);
         item_p2Layout.setHorizontalGroup(
             item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(item_p2Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, item_p2Layout.createSequentialGroup()
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(item_p2Layout.createSequentialGroup()
                         .addGap(54, 54, 54)
                         .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(item_lbl_id)
                             .addComponent(item_lbl_name)
-                            .addGroup(item_p2Layout.createSequentialGroup()
-                                .addGap(23, 23, 23)
-                                .addComponent(item_lbl_price)))
-                        .addGap(2, 2, 2))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, item_p2Layout.createSequentialGroup()
-                        .addContainerGap()
+                            .addComponent(item_lbl_price))
+                        .addGap(2, 2, 2)
+                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(item_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(item_txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 64, Short.MAX_VALUE)
+                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(item_lbl_Qnt)
+                            .addComponent(item_lbl_category))
+                        .addGap(31, 31, 31))
+                    .addGroup(item_p2Layout.createSequentialGroup()
+                        .addGap(85, 85, 85)
                         .addComponent(item_btn_reset)
-                        .addGap(30, 30, 30)))
-                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(item_p2Layout.createSequentialGroup()
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(item_p2Layout.createSequentialGroup()
-                                .addGap(24, 24, 24)
-                                .addComponent(item_txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
-                                .addComponent(item_lbl_Qnt))
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, item_p2Layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(item_p2Layout.createSequentialGroup()
-                                        .addComponent(item_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(item_lbl_category))
-                                    .addGroup(item_p2Layout.createSequentialGroup()
-                                        .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, 214, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(0, 0, Short.MAX_VALUE)))))
-                        .addGap(32, 32, 32)
-                        .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(item_dropdown_category, 0, 214, Short.MAX_VALUE)
-                            .addComponent(item_spinner_qnt))
-                        .addGap(8, 8, 8))
-                    .addGroup(item_p2Layout.createSequentialGroup()
-                        .addGap(119, 119, 119)
+                        .addGap(79, 79, 79)
                         .addComponent(item_btn_add)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(item_btn_search)
+                        .addGap(69, 69, 69)))
+                .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(item_dropdown_category, 0, 214, Short.MAX_VALUE)
+                        .addComponent(item_spinner_qnt))
+                    .addGroup(item_p2Layout.createSequentialGroup()
+                        .addGap(18, 18, 18)
                         .addComponent(item_btn_edit)
-                        .addGap(98, 98, 98)
-                        .addComponent(item_btn_delete)))
-                .addGap(81, 81, 81))
+                        .addGap(71, 71, 71)
+                        .addComponent(item_btn_delete))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 265, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(43, 43, 43))
         );
         item_p2Layout.setVerticalGroup(
             item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -266,13 +424,16 @@ public class Add_items extends javax.swing.JFrame {
                 .addGap(56, 56, 56)
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(item_txt_price, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(item_lbl_price))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 177, Short.MAX_VALUE)
+                    .addComponent(item_lbl_price, javax.swing.GroupLayout.PREFERRED_SIZE, 34, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 108, Short.MAX_VALUE)
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40)
                 .addGroup(item_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(item_btn_reset)
                     .addComponent(item_btn_add)
                     .addComponent(item_btn_edit)
-                    .addComponent(item_btn_delete))
+                    .addComponent(item_btn_delete)
+                    .addComponent(item_btn_search))
                 .addGap(37, 37, 37))
         );
 
@@ -283,6 +444,7 @@ public class Add_items extends javax.swing.JFrame {
         item_spinner_qnt.getAccessibleContext().setAccessibleName("Item Quantity");
         item_dropdown_category.getAccessibleContext().setAccessibleName("Item category");
         item_btn_edit.getAccessibleContext().setAccessibleName("item edit");
+        jLabel1.getAccessibleContext().setAccessibleName("*for Edit and Delete use id of item to search ");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -315,82 +477,85 @@ public class Add_items extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void item_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_addActionPerformed
-         String[] item_arr = new String[8];
-        int countInserted = 0;
-        String item_id = item_txt_id.getText();
-        String item_name = item_txt_name.getText();
-        String item_price = item_txt_price.getText();
-        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
-        //String item_category = item_dropdown_category.getSelectedItem()
-        Object item_qnt;
-        item_qnt = item_spinner_qnt.getValue();
+//        String[] item_arr = new String[8];
+//        int countInserted = 0;
+//        String item_id = item_txt_id.getText();
+//        String item_name = item_txt_name.getText();
+//        String item_price = item_txt_price.getText();
+//        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
+//        //String item_category = item_dropdown_category.getSelectedItem()
+//        Object item_qnt;
+//        item_qnt = item_spinner_qnt.getValue();
+//
+//        item_code = Integer.parseInt(item_txt_id.getText());
+//        System.out.println("id " + item_code);
+//
+//        name = item_txt_name.getText();
+//        System.out.println("name " + name);
+//
+//        Object item_qnt1;
+//        item_qnt1 = item_spinner_qnt.getValue();
+//        Quantity = Integer.parseInt(String.valueOf(item_qnt1));
+//        System.out.println("Quantity " + Quantity);
+//
+//        category_id = item_dropdown_category.getSelectedIndex();
+//        System.out.println("category " + category_id);
+//
+//        price = Double.parseDouble(item_txt_price.getText());
+//        System.out.println("price " + price);
+//
+//        try {
+//
+//            c=Conn.setConnect();
+//           //statement = connection.createStatement();
+//
+//            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
+//            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
+              String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
+              set_data(sqlInsert,0);
+//
+//
+//            pstm = c.prepareStatement(sqlInsert);
+//            pstm.setInt(1, item_code);
+//            pstm.setString(2, name);
+//            pstm.setInt(3, Quantity);
+//            pstm.setInt(4, category_id);
+//            pstm.setDouble(5, price);
+//
+//            System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
+//            countInserted = pstm.executeUpdate();
+//            System.out.println(countInserted + " records inserted.\n");
+//
+//        } catch (SQLException ex) {
+//            ex.printStackTrace();
+//        } finally {
+//            try {
+//                c.close();
+//                //statement.close();
+//            } catch (SQLException ex) {
+//                Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
+//            }
+//
+//        }
+//
+//        item_arr[0] = item_id;
+//        item_arr[1] = item_name;
+//        item_arr[2] = item_price;
+//        item_arr[4] = String.valueOf(item_qnt);
+//        item_arr[5] = String.valueOf(item_category);
+//        //item_arr[6] = item_address;
+//        item_arr[6] = countInserted + " records inserted.\n";
+//        item_arr[7] = "\n Records inserted successfully";
+//
+//        JOptionPane.showMessageDialog(this, item_arr);
 
-        int item_id1 = Integer.parseInt(item_txt_id.getText());
-        System.out.println("id " + item_id1);
 
-        String item_name1 = item_txt_name.getText();
-        System.out.println("name " + item_name1);
-
-        Object item_qnt1;
-        item_qnt1 = item_spinner_qnt.getValue();
-        int item_qnt2 = Integer.parseInt(String.valueOf(item_qnt1));
-        System.out.println("Quantity " + item_qnt2);
-
-        int item_category1 = item_dropdown_category.getSelectedIndex();
-        System.out.println("category " + item_category1);
-
-        double item_price1 = Double.parseDouble(item_txt_price.getText());
-        System.out.println("price " + item_price1);
-
-        try {
-
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWD);
-           //statement = connection.createStatement();
-
-            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
-            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
-            String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
-            
-            
-            PreparedStatement pstm = connection.prepareStatement(sqlInsert);
-            pstm.setInt(1, item_id1);
-            pstm.setString(2, item_name1);
-            pstm.setInt(3, item_qnt2);
-            pstm.setInt(4, item_category1);
-            pstm.setDouble(5, item_price1);
-            
-            System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
-            countInserted = pstm.executeUpdate();
-            System.out.println(countInserted + " records inserted.\n");
-
-        } catch (SQLException ex) {
-            ex.printStackTrace();
-        } finally {
-            try {
-                connection.close();
-                //statement.close();
-            } catch (SQLException ex) {
-                Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        }
-
-        item_arr[0] = item_id;
-        item_arr[1] = item_name;
-        item_arr[2] = item_price;
-        item_arr[4] = String.valueOf(item_qnt);
-        item_arr[5] = String.valueOf(item_category);
-        //item_arr[6] = item_address;
-        item_arr[6] = countInserted + " records inserted.\n";
-        item_arr[7] = "\n Records inserted successfully";
-
-        JOptionPane.showMessageDialog(this, item_arr);
-
-        
     }//GEN-LAST:event_item_btn_addActionPerformed
 
     private void item_btn_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_editActionPerformed
         // TODO add your handling code here:
+        String sqlquery = "update `item_master` set name= ?,Quantity = ?,category_id= ?,price= ? where item_code=?";
+        set_data(sqlquery,1);
     }//GEN-LAST:event_item_btn_editActionPerformed
 
     private void item_btn_dashbdActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_dashbdActionPerformed
@@ -404,7 +569,65 @@ public class Add_items extends javax.swing.JFrame {
 
     private void item_dropdown_categoryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_dropdown_categoryActionPerformed
         // TODO add your handling code here:
+        if( item_dropdown_category.getSelectedIndex() == 0 )
+        {
+            Add_Category obj = new Add_Category();
+            obj.setVisible(true);
+            //setVisible(false);
+        }
     }//GEN-LAST:event_item_dropdown_categoryActionPerformed
+
+    private void item_btn_resetActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_resetActionPerformed
+        // TODO add your handling code here:
+        reset_fields();
+    }//GEN-LAST:event_item_btn_resetActionPerformed
+
+    private void item_btn_searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_searchActionPerformed
+
+
+        // main operation...
+        try{
+            c=Conn.setConnect();
+
+            int id = Integer.parseInt(item_txt_id.getText());
+            String query="select * from item_master where item_code=?";
+            PreparedStatement psmt = c.prepareStatement(query);
+            psmt.setInt(1,id);
+            rs = psmt.executeQuery();
+
+            while(rs.next()){
+                //temp=temp+1;
+                item_code = rs.getInt("item_code");
+                category_id = rs.getInt("category_id");
+                name = rs.getString("name");
+                price=rs.getDouble("price");
+                Quantity = rs.getInt("Quantity");
+
+
+            }
+
+            // Function that fill form from database record data...
+            set_fields(item_code, name, Quantity, category_id, price);
+
+
+
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            try{c.close();}
+            catch(Exception e){e.printStackTrace();}
+
+        }
+
+    }//GEN-LAST:event_item_btn_searchActionPerformed
+
+    private void item_btn_deleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_deleteActionPerformed
+        // TODO add your handling code here:
+        String query = "delete from item_master where item_code=?";
+        set_data(query,2);
+    }//GEN-LAST:event_item_btn_deleteActionPerformed
 
     /**
      * @param args the command line arguments
@@ -413,7 +636,7 @@ public class Add_items extends javax.swing.JFrame {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html
          */
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -449,6 +672,7 @@ public class Add_items extends javax.swing.JFrame {
     private javax.swing.JButton item_btn_delete;
     private javax.swing.JButton item_btn_edit;
     private javax.swing.JButton item_btn_reset;
+    private javax.swing.JButton item_btn_search;
     private javax.swing.JComboBox<String> item_dropdown_category;
     private javax.swing.JLabel item_lbl_Qnt;
     private javax.swing.JLabel item_lbl_category;
@@ -462,6 +686,7 @@ public class Add_items extends javax.swing.JFrame {
     private javax.swing.JTextField item_txt_id;
     private javax.swing.JTextField item_txt_name;
     private javax.swing.JTextField item_txt_price;
+    private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel4;
     // End of variables declaration//GEN-END:variables
 }
