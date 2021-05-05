@@ -309,11 +309,14 @@ public class Add_items extends javax.swing.JFrame {
         item_dropdown_category.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         item_dropdown_category.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "** Create New **" }));
         item_dropdown_category.setName("item_dropdown_category"); // NOI18N
+<<<<<<< HEAD
         item_dropdown_category.addItemListener(new java.awt.event.ItemListener() {
             public void itemStateChanged(java.awt.event.ItemEvent evt) {
                 item_dropdown_categoryItemStateChanged(evt);
             }
         });
+=======
+>>>>>>> b49005a1993645aa5cbacb41bc86f5b1e94cc592
         item_dropdown_category.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 item_dropdown_categoryFocusGained(evt);
@@ -595,11 +598,14 @@ public class Add_items extends javax.swing.JFrame {
         //loadCategory();
     }//GEN-LAST:event_item_dropdown_categoryMouseClicked
 
+<<<<<<< HEAD
     private void item_dropdown_categoryItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_item_dropdown_categoryItemStateChanged
         // TODO add your handling code here:
         
     }//GEN-LAST:event_item_dropdown_categoryItemStateChanged
 
+=======
+>>>>>>> b49005a1993645aa5cbacb41bc86f5b1e94cc592
     /**
      * @param args the command line arguments
      */
