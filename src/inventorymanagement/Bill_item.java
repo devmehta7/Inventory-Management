@@ -5,6 +5,14 @@
  */
 package inventorymanagement;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.table.DefaultTableModel;
+
 /**
  *
  * @author admin
@@ -14,6 +22,15 @@ public class Bill_item extends javax.swing.JFrame {
     /**
      * Creates new form bill_item
      */
+    Connection conn = null;
+    Statement stmt = null;
+    ResultSet rs = null;
+    DefaultTableModel tblobj = new DefaultTableModel();
+    static int SrNo = 0;
+    String arr[][] = new String[5][5];
+    double grandtotal = 0.0;
+    double gettotal = 0.0;
+
     public Bill_item() {
         initComponents();
     }
@@ -79,6 +96,11 @@ public class Bill_item extends javax.swing.JFrame {
         bill1_btn_add.setBackground(new java.awt.Color(255, 255, 153));
         bill1_btn_add.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
         bill1_btn_add.setText("ADD");
+        bill1_btn_add.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bill1_btn_addActionPerformed(evt);
+            }
+        });
 
         bill1_btn_delete.setBackground(new java.awt.Color(255, 255, 153));
         bill1_btn_delete.setFont(new java.awt.Font("Times New Roman", 1, 14)); // NOI18N
@@ -153,6 +175,11 @@ public class Bill_item extends javax.swing.JFrame {
 
             public Class getColumnClass(int columnIndex) {
                 return types [columnIndex];
+            }
+        });
+        bill1_tbl.addContainerListener(new java.awt.event.ContainerAdapter() {
+            public void componentAdded(java.awt.event.ContainerEvent evt) {
+                bill1_tblComponentAdded(evt);
             }
         });
         jScrollPane1.setViewportView(bill1_tbl);
@@ -240,12 +267,98 @@ public class Bill_item extends javax.swing.JFrame {
 
     private void bill1_btn_nextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill1_btn_nextActionPerformed
         // TODO add your handling code here:
-        
+
         Bill_generate obj = new Bill_generate();
         obj.setVisible(true);
         setVisible(false);
-        
+
     }//GEN-LAST:event_bill1_btn_nextActionPerformed
+
+    private void bill1_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill1_btn_addActionPerformed
+        // TODO add your handling code here:
+
+        //Table 
+        DefaultTableModel tblobj = new DefaultTableModel();
+        bill1_tbl.setModel(tblobj);
+
+        tblobj.addColumn("Sr No.");
+        tblobj.addColumn("Product Name");
+        tblobj.addColumn("Quantity");
+        tblobj.addColumn("Amount");
+        tblobj.addColumn("Total");
+
+        //variable declaration
+        String product_name = null;
+        double amount = 0.0;
+        int qnttxt = Integer.parseInt(bill1_txt_Qnt.getText());
+        double totalamt;
+        int qntdb = 0;// minus operation
+        int qnt=0;
+        
+        int item_id = Integer.parseInt(bill1_txt_itemId.getText());
+
+        String query = "SELECT name,Quantity,price from `item_master` WHERE item_code=" + item_id;
+        //System.out.println(query);
+
+        //database operation
+        try {
+            conn = Conn.setConnect();
+            stmt = conn.createStatement();
+
+            rs = stmt.executeQuery(query);
+
+            //name, Quantity, Price;
+            //Sr no, Product name, quantity, amount, total;
+            while (rs.next()) {
+                product_name = rs.getString("name");
+                qntdb = rs.getInt("Quantity");
+                amount = rs.getDouble("price");
+            }
+
+        } catch (SQLException ex) {
+            Logger.getLogger(Bill_item.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        //calculation
+        totalamt = qnttxt * amount;//total = qnt * amount
+
+        //storing the data into array
+        arr[SrNo][0] = String.valueOf(SrNo);
+        arr[SrNo][1] = String.valueOf(product_name);
+        arr[SrNo][2] = String.valueOf(qnttxt);
+        arr[SrNo][3] = String.valueOf(amount);
+        arr[SrNo][4] = String.valueOf(totalamt);
+
+        //array content view
+        /*
+       for(int i=0;i<SrNo+1;i++)
+        {
+            for(int j=0;j<5;j++)
+            {
+                System.out.print(arr[i][j]);
+            }
+        }
+         */
+        for (int i = 0; i < SrNo + 1; i++) {
+
+            tblobj.insertRow(i, new Object[]{arr[i][0], arr[i][1], arr[i][2], arr[i][3], arr[i][4]});
+            gettotal = Double.parseDouble(arr[i][4]);
+        }
+        //double sum;
+        grandtotal = grandtotal + gettotal;
+        System.out.println("Grand total " + grandtotal);
+        SrNo++;
+
+        //tblobj.addRow(new Object[] {++SrNo,product_name,qnttxt,amount,totalamt});
+        //tblobj.insertRow(0, new Object[] {SrNo,product_name,qnttxt,amount,totalamt});
+
+    }//GEN-LAST:event_bill1_btn_addActionPerformed
+
+    private void bill1_tblComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_bill1_tblComponentAdded
+        // TODO add your handling code here:
+
+
+    }//GEN-LAST:event_bill1_tblComponentAdded
 
     /**
      * @param args the command line arguments
