@@ -12,17 +12,11 @@ import java.sql.DriverManager;
  */
 public class Conn {
     static Connection c;
-<<<<<<< HEAD
-    static final String db_url = "jdbc:mysql://localhost/inventory";
-    static final String db_driver = "com.mysql.jdbc.Driver";
-    static final String db_user = "user1";
-    static final String db_pass = "User1db@123";
-=======
     static final String db_url = "jdbc:mysql://localhost:3306/invmngtdb2";
     static final String db_driver = "com.mysql.jdbc.Driver";
     static final String db_user = "root";
     static final String db_pass = "";
->>>>>>> b49005a1993645aa5cbacb41bc86f5b1e94cc592
+
     
     
     public  static Connection setConnect(){

@@ -13,6 +13,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.sql.Statement;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -30,14 +32,32 @@ public class Bill_generate extends javax.swing.JFrame {
     Statement stmt = null;
     PreparedStatement pstm = null;
     ResultSet rs = null;
-
+    Timestamp ts = null;
+    Bill_item billitem = null;
+    
+    static int cus_id = 0;
+    static int bill_id = 0;
+    
+    
     String cus_name = "";
     String cus_mobno = "";
-    int cus_id = 0;
-    int counter = 0;
+    
+    
+    //int counter = 0;
     
     public Bill_generate() {
         initComponents();
+    
+    //current time stamp logic
+        Date date= new Date();
+        //getTime() returns current time in milliseconds
+	long time = date.getTime();
+        //Passed the milliseconds to constructor of Timestamp class 
+        System.out.println(time);
+        Timestamp ts = new Timestamp(time);
+	System.out.println("Current Time Stamp: "+ts);
+        
+    
     }
     
     void getdata()
@@ -128,6 +148,7 @@ public class Bill_generate extends javax.swing.JFrame {
         bill2_btn_add = new javax.swing.JButton();
         bill2_txt_custNm = new javax.swing.JTextField();
         bill2_txt_mobileNo = new javax.swing.JTextField();
+        bill2_btn_test = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Bill Page");
@@ -232,6 +253,13 @@ public class Bill_generate extends javax.swing.JFrame {
 
         bill2_txt_mobileNo.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
 
+        bill2_btn_test.setText("testing");
+        bill2_btn_test.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bill2_btn_testActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout bill2_p2Layout = new javax.swing.GroupLayout(bill2_p2);
         bill2_p2.setLayout(bill2_p2Layout);
         bill2_p2Layout.setHorizontalGroup(
@@ -249,11 +277,14 @@ public class Bill_generate extends javax.swing.JFrame {
                         .addGap(69, 69, 69)
                         .addGroup(bill2_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(bill2_txt_custNm)
-                            .addComponent(bill2_txt_mobileNo, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE)))
-                    .addGroup(bill2_p2Layout.createSequentialGroup()
-                        .addGap(300, 300, 300)
-                        .addComponent(bill2_btn_add)))
+                            .addComponent(bill2_txt_mobileNo, javax.swing.GroupLayout.DEFAULT_SIZE, 187, Short.MAX_VALUE))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+            .addGroup(bill2_p2Layout.createSequentialGroup()
+                .addGap(300, 300, 300)
+                .addComponent(bill2_btn_add)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(bill2_btn_test)
+                .addGap(42, 42, 42))
         );
         bill2_p2Layout.setVerticalGroup(
             bill2_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -269,7 +300,9 @@ public class Bill_generate extends javax.swing.JFrame {
                     .addComponent(bill2_lbl_contNo)
                     .addComponent(bill2_txt_mobileNo, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(bill2_btn_add)
+                .addGroup(bill2_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bill2_btn_add)
+                    .addComponent(bill2_btn_test))
                 .addContainerGap(16, Short.MAX_VALUE))
         );
 
@@ -316,30 +349,58 @@ public class Bill_generate extends javax.swing.JFrame {
     private void bill2_btn_billgenerateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill2_btn_billgenerateActionPerformed
         // TODO add your handling code here:
 
-        Bill_item billitem = new Bill_item();
+        billitem = new Bill_item();
         //DefaultTableModel tbl =  billitem.getmodel();
         String arr[][] =  Bill_item.arr;
         
         
+        
         try
         {
-            String insquery = "INSERT INTO `billing_transaction` (bill_id,item_id,cus_id,Quantity,total) VALUES (?,?,?,?,?)";
-                  
+            String insquery_bill = "INSERT INTO `bill_master` (customer_id,Total) VALUES (?,?)";
+            String insquery_billtrans = "INSERT INTO `billing_transaction` (bill_id,item_id,cus_id,Quantity,total) VALUES (?,?,?,?,?)";
+            
+            int inscount1=0,inscount2=0;
             
             conn = Conn.setConnect();
             
-            pstm = conn.prepareStatement(insquery);
-          
-            for(int i=0;i<Bill_item.SrNo;i++)
+            //pstm = conn.prepareStatement(insquery_billtrans);
+            pstm = conn.prepareStatement(insquery_bill);
+            pstm.setInt(1,cus_id);
+            pstm.setDouble(2, billitem.grandtotal);
+            inscount1 = pstm.executeUpdate();
+            JOptionPane.showMessageDialog(this, inscount1+" records inserted Successfully in bill_master");
+            
+            //System.out.println("Grand Total: - " + billitem.grandtotal);
+            
+            System.out.println("Sr No: - " +Bill_item.SrNo);  
+        bill_id = getBillid();
+        System.out.println(bill_id + " is the bill id ");
+            
+       //INSERT INTO `billing_transaction` (bill_id,item_id,cus_id,Quantity,total) VALUES (?,?,?,?,?)
+       pstm = conn.prepareStatement(insquery_billtrans);
+            
+        
+            for(int i=0;i<(Bill_item.SrNo);i++)
             {
-                for(int j=0;j<6;j++)
-                {
-                    
-                    System.out.print(" "+arr[i][j]);
-                 
-                }
+                //for(int j=5;j<6;j++)
+                //{
+                    pstm.setInt(1, bill_id);
+                    pstm.setInt(2, Integer.parseInt(arr[i][5]));
+                    //System.out.print(" "+arr[i][j]);
+                    pstm.setInt(3,cus_id);                 
+                //}
+                    pstm.setInt(4,Integer.parseInt(arr[i][2]));
+                    pstm.setDouble(5,Double.parseDouble(arr[i][4]));
+                
                 System.out.println("");
+                
+                inscount2 +=  pstm.executeUpdate();
             }
+            //inscount2 = pstm.executeUpdate();
+            
+            JOptionPane.showMessageDialog(this, inscount2+" records inserted Successfully in bill_transaction");
+            
 
         }
         catch(SQLException e)
@@ -362,40 +423,84 @@ public class Bill_generate extends javax.swing.JFrame {
         
         
         
-        //database operations
-        
-        
+        //database operations       
         
     }//GEN-LAST:event_bill2_btn_billgenerateActionPerformed
 
-    private void bill2_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill2_btn_addActionPerformed
-        // TODO add your handling code here:
-        
-        //if(co)
-        
-        getdata();
-        
-            String slqry = "SELECT id FROM `customer_master` WHERE name=? AND contact=?";
+    
+    //-----------------------
+    int getBillid()
+    {
+         String slqry = "SELECT id FROM `bill_master` WHERE (customer_id="+cus_id+") AND (Total="+billitem.grandtotal+")";
             
             System.out.println(slqry);
           
-            
+        
             
         try 
         {
             conn = Conn.setConnect();
-            
-            pstm = conn.prepareStatement(slqry);
-            pstm.setString(1, cus_name);
-            pstm.setString(2, cus_mobno);
-            rs = pstm.executeQuery(slqry);
+                    
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(slqry);
             
             while(rs.next())
             {
-                counter = 1;
-                cus_id = rs.getInt("id");
+                bill_id = rs.getInt("id");
+                System.out.println(bill_id);
+                return bill_id;
             }
 
+
+        
+            
+        } catch (SQLException ex) {
+            Logger.getLogger(Bill_generate.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        finally
+        {
+            try
+            {
+                //conn.close();
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
+        }
+       
+        
+        return 0;
+    }
+    
+    
+    //checking whether the customer is regular custumer or new.
+    int isRecordAvail()
+    {
+        
+        //String slqry = "SELECT id FROM `customer_master` WHERE name=?";// AND contact=?";
+        String slqry = "SELECT id FROM `customer_master` WHERE contact="+cus_mobno;
+            
+            System.out.println(slqry);
+          
+        
+            
+        try 
+        {
+            conn = Conn.setConnect();
+                    
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery(slqry);
+            
+            while(rs.next())
+            {
+                cus_id = rs.getInt("id");
+                System.out.println(cus_id);
+                return cus_id;
+            }
+
+
+        
             
         } catch (SQLException ex) {
             Logger.getLogger(Bill_generate.class.getName()).log(Level.SEVERE, null, ex);
@@ -411,17 +516,43 @@ public class Bill_generate extends javax.swing.JFrame {
                 e.printStackTrace();
             }
         }
-                       
+       
+        
+        return 0;
+    }
+    
+    private void bill2_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill2_btn_addActionPerformed
+        // TODO add your handling code here:
+        
+        int counter;
+        getdata();
+        
+        
+        counter = isRecordAvail();//it will check whether the record is already available or not
+        System.out.println("counter = "+counter);
         if(counter == 0)
         {
             String sqlInsert = "INSERT INTO `customer_master` (name,contact) VALUES (?,?)";
             insert_data(sqlInsert);
 
         }
+        else
+        {
+            JOptionPane.showMessageDialog(this, "You are our regular customer");
+        }
             
+        counter/*cus_id*/ = isRecordAvail();
         
-              
+     
     }//GEN-LAST:event_bill2_btn_addActionPerformed
+
+    private void bill2_btn_testActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill2_btn_testActionPerformed
+        // TODO add your handling code here:
+        
+        bill_id = getBillid();
+        System.out.println(bill_id + " is the bill id ");
+        
+    }//GEN-LAST:event_bill2_btn_testActionPerformed
 
     /**
      * @param args the command line arguments
@@ -470,6 +601,7 @@ public class Bill_generate extends javax.swing.JFrame {
     private javax.swing.JButton bill2_btn_back;
     private javax.swing.JButton bill2_btn_billgenerate;
     private javax.swing.JButton bill2_btn_dashbd;
+    private javax.swing.JButton bill2_btn_test;
     private javax.swing.JLabel bill2_lbl_contNo;
     private javax.swing.JLabel bill2_lbl_custNm;
     private javax.swing.JLabel bill2_lbl_title;

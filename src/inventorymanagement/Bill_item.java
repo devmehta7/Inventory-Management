@@ -27,10 +27,13 @@ public class Bill_item extends javax.swing.JFrame {
     Statement stmt = null;
     ResultSet rs= null;
     DefaultTableModel tblobj = new DefaultTableModel();
+    
     static int SrNo = 0;
+    static double grandtotal = 0.0;
     static String arr[][] = new String[6][6];
+    
     double gettotal = 0.0;
-    double grandtotal = 0.0;
+    
     int qnt = 0;
    
     
@@ -292,7 +295,7 @@ public class Bill_item extends javax.swing.JFrame {
         
         Bill_generate obj = new Bill_generate();
         obj.setVisible(true);
-        setVisible(false);
+        //setVisible(false);
         
     }//GEN-LAST:event_bill1_btn_nextActionPerformed
 
@@ -305,10 +308,10 @@ public class Bill_item extends javax.swing.JFrame {
        //String arr[][] = new String[5][5];
        
        tblobj.addColumn("Sr No.");//,"Product Name","Quantity","Amount","Total");
-       tblobj.addColumn("item_code");
+       //tblobj.addColumn("item_code");
        tblobj.addColumn("Product Name");
        tblobj.addColumn("Quantity");
-       tblobj.addColumn("Amount");
+       tblobj.addColumn("Price");
        tblobj.addColumn("Total");
        
         System.out.println("Sr no " + SrNo);

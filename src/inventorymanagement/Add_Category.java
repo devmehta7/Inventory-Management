@@ -24,17 +24,13 @@ public class Add_Category extends javax.swing.JFrame {
      * Creates new form Add_Category
      */
     
-<<<<<<< HEAD
-  
-    Connection c=null;
-=======
-     static final String DB_URL = "jdbc:mysql://localhost:3306/invmngtdb2";
+    static final String DB_URL = "jdbc:mysql://localhost:3306/invmngtdb2";
     static final String DB_DRV = "com.mysql.jdbc.Driver";
     static final String DB_USER = "root";
     static final String DB_PASSWD = "";
 
     Connection connection = null;
->>>>>>> b49005a1993645aa5cbacb41bc86f5b1e94cc592
+
     //Statement statement = null;
     PreparedStatement pstm = null;
 
@@ -202,15 +198,10 @@ public class Add_Category extends javax.swing.JFrame {
 
             //String sqlInsert = "INSERT INTO category(id,name) VALUES (4,'')";
             //String sqlInsert = "INSERT INTO category(id,name) VALUES (category_id,category_name)";
-<<<<<<< HEAD
-            String sqlInsert = "INSERT INTO `Category` (name) VALUES (?)";
-
-            PreparedStatement pstm = c.prepareStatement(sqlInsert);
-=======
             String sqlInsert = "INSERT INTO `category` (name) VALUES (?)";
 
             PreparedStatement pstm = connection.prepareStatement(sqlInsert);
->>>>>>> b49005a1993645aa5cbacb41bc86f5b1e94cc592
+
             //pstm.setInt(1, category_id);
             pstm.setString(1, category_name);
            
