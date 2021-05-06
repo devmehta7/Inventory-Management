@@ -23,11 +23,7 @@ public class Add_Category extends javax.swing.JFrame {
     /**
      * Creates new form Add_Category
      */
-    
-    static final String DB_URL = "jdbc:mysql://localhost:3306/invmngtdb2";
-    static final String DB_DRV = "com.mysql.jdbc.Driver";
-    static final String DB_USER = "root";
-    static final String DB_PASSWD = "";
+   
 
     Connection connection = null;
 
@@ -193,7 +189,7 @@ public class Add_Category extends javax.swing.JFrame {
         //insert operations
         try {
 
-            connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWD);
+            connection = Conn.setConnect();
             //statement = connection.createStatement();
 
             //String sqlInsert = "INSERT INTO category(id,name) VALUES (4,'')";

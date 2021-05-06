@@ -11,6 +11,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
@@ -39,6 +40,57 @@ public class Bill_item extends javax.swing.JFrame {
     
     public Bill_item() {
         initComponents();
+    }
+    int quantity_operation(int id,int user_quantity ){
+        // Here the quantity validation code comes first..
+        int flag=0;
+        Connection c = Conn.setConnect();
+            
+        try{
+            
+            
+             c = Conn.setConnect();
+            int up_res=0;
+            int qua_diff=0;
+            int data_quantity=0;
+            String name;
+            Statement stmt1 = c.createStatement();
+            ResultSet rs1=null;    
+                       
+//          user_quantity = Integer.parseInt(arr[i][2]);
+//          int item_id = Integer.parseInt(arr[i][5]);
+            String query1 = "select Quantity,name from `item_master` where (item_code="+id+")";
+            rs1 = stmt1.executeQuery(query1);
+            while(rs1.next()){
+                 
+                data_quantity = rs1.getInt("Quantity");
+                name = rs1.getString("name");
+                qua_diff = data_quantity-user_quantity;
+
+                if(qua_diff < 0){
+
+                    JOptionPane.showMessageDialog(this,"oops,only "+ data_quantity+" "+name+" available" );
+                    flag=1;
+                }
+            }
+                    // reducing sold quantity from item master
+            if(flag==0){    
+                String query2 = "update `item_master` set Quantity ="+qua_diff+" where item_code="+id;
+                up_res=stmt1.executeUpdate(query2);
+                System.out.println("update query execution result: "+up_res);                   
+            }
+                                    
+            
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
+        finally{
+            try{c.close();}
+            catch(Exception e){e.printStackTrace();}
+        }
+        return flag;
+        
     }
 
     /**
@@ -291,10 +343,15 @@ public class Bill_item extends javax.swing.JFrame {
     }//GEN-LAST:event_bill1_btn_cancelActionPerformed
 
     private void bill1_btn_nextActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill1_btn_nextActionPerformed
-        // TODO add your handling code here:
+        
+        
         
         Bill_generate obj = new Bill_generate();
         obj.setVisible(true);
+        
+        
+        
+        
         //setVisible(false);
         
     }//GEN-LAST:event_bill1_btn_nextActionPerformed
@@ -302,7 +359,7 @@ public class Bill_item extends javax.swing.JFrame {
     private void bill1_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bill1_btn_addActionPerformed
         // TODO add your handling code here:
         
-        tblobj = new DefaultTableModel();
+       tblobj = new DefaultTableModel();
        bill1_tbl.setModel(tblobj);
        
        //String arr[][] = new String[5][5];
@@ -316,7 +373,7 @@ public class Bill_item extends javax.swing.JFrame {
        
         System.out.println("Sr no " + SrNo);
         
-        conn = Conn.setConnect();
+        //conn = Conn.setConnect();
         
         String product_name = null;
         int item_code = 0;
@@ -324,74 +381,77 @@ public class Bill_item extends javax.swing.JFrame {
         int qnttxt = Integer.parseInt(bill1_txt_Qnt.getText());
         double totalamt;
         int qntdb = 0;// minus operation
-        
+        int qua_res=1;
         
         int item_id = Integer.parseInt(bill1_txt_itemId.getText());
-        String query = "SELECT item_code,name,Quantity,price from `item_master` WHERE item_code="+item_id;
-        System.out.println(query);
         
+        qua_res=quantity_operation(item_id, qnttxt);
         
-        
-        try {
-            conn = Conn.setConnect();
-            stmt = conn.createStatement();
-            
-            rs = stmt.executeQuery(query);
-            
-            //name, Quantity, Price;
-            //Sr no, Product name, quantity, amount, total;
-            while(rs.next())
-            {
-                item_code = rs.getInt("item_code");
-                product_name = rs.getString("name");
-                qntdb = rs.getInt("Quantity");
-                amount = rs.getDouble("price");
-                //tblobj.addRow(new Object[] {10,rs.getString("name"),Integer.parseInt(bill1_txt_Qnt.getText()),rs.getDouble("price"),});
+        if(qua_res == 0){
+            String query = "SELECT item_code,name,Quantity,price from `item_master` WHERE item_code="+item_id;
+            System.out.println(query);
+
+
+            try {
+                conn = Conn.setConnect();
+                stmt = conn.createStatement();
+
+                rs = stmt.executeQuery(query);
+
+                //name, Quantity, Price;
+                //Sr no, Product name, quantity, amount, total;
+                while(rs.next())
+                {
+                    item_code = rs.getInt("item_code");
+                    product_name = rs.getString("name");
+                    qntdb = rs.getInt("Quantity");
+                    amount = rs.getDouble("price");
+                    //tblobj.addRow(new Object[] {10,rs.getString("name"),Integer.parseInt(bill1_txt_Qnt.getText()),rs.getDouble("price"),});
+                }
+
+
+            } catch (SQLException ex) {
+                Logger.getLogger(Bill_item.class.getName()).log(Level.SEVERE, null, ex);
             }
-        
-        
-        } catch (SQLException ex) {
-            Logger.getLogger(Bill_item.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
-        totalamt = qnttxt * amount;//total = qnt * amount
-        
-       
-       //tblobj.insertRow(0, new Object[] { "1", "Parlege" });
-       //tblobj.insertRow(1, new Object[] {"parle G "} );
-        
-       //tblobj.addRow(new Object[] {10,"demo","18652"});
-    
-       arr[SrNo][0] = String.valueOf(SrNo);
-       arr[SrNo][1] = String.valueOf(product_name);
-       arr[SrNo][2] = String.valueOf(qnttxt);
-       arr[SrNo][3] = String.valueOf(amount);
-       arr[SrNo][4] = String.valueOf(totalamt);
-       arr[SrNo][5] = String.valueOf(item_code);        
-        
-       /*
-       for(int i=0;i<SrNo+1;i++)
-        {
-            for(int j=0;j<5;j++)
+
+            totalamt = qnttxt * amount;//total = qnt * amount
+
+
+           //tblobj.insertRow(0, new Object[] { "1", "Parlege" });
+           //tblobj.insertRow(1, new Object[] {"parle G "} );
+
+           //tblobj.addRow(new Object[] {10,"demo","18652"});
+
+           arr[SrNo][0] = String.valueOf(SrNo);
+           arr[SrNo][1] = String.valueOf(product_name);
+           arr[SrNo][2] = String.valueOf(qnttxt);
+           arr[SrNo][3] = String.valueOf(amount);
+           arr[SrNo][4] = String.valueOf(totalamt);
+           arr[SrNo][5] = String.valueOf(item_code);        
+
+           /*
+           for(int i=0;i<SrNo+1;i++)
             {
-                System.out.print(arr[i][j]);
+                for(int j=0;j<5;j++)
+                {
+                    System.out.print(arr[i][j]);
+                }
             }
+           */
+
+           for(int i=0;i<SrNo+1;i++)
+           {
+               totalamt = qnttxt * amount;//total = qnt * amount
+               //tblobj.insertRow(i, new Object[] {SrNo,product_name,qnttxt,amount,totalamt});
+               tblobj.insertRow(i, new Object[] {arr[i][0],arr[i][1],arr[i][2],arr[i][3],arr[i][4]});
+               gettotal = Double.parseDouble(arr[i][4]);
+           }
+           grandtotal = grandtotal + gettotal;
+           bill1_lbl_gtotalval.setText(String.valueOf(grandtotal));
+            //System.out.println("Grand total = " +grandtotal);
+           SrNo++;
         }
-       */
-       
-       for(int i=0;i<SrNo+1;i++)
-       {
-           totalamt = qnttxt * amount;//total = qnt * amount
-           //tblobj.insertRow(i, new Object[] {SrNo,product_name,qnttxt,amount,totalamt});
-           tblobj.insertRow(i, new Object[] {arr[i][0],arr[i][1],arr[i][2],arr[i][3],arr[i][4]});
-           gettotal = Double.parseDouble(arr[i][4]);
-       }
-       grandtotal = grandtotal + gettotal;
-       bill1_lbl_gtotalval.setText(String.valueOf(grandtotal));
-        //System.out.println("Grand total = " +grandtotal);
-       SrNo++;
-       
-       
+
        //tblobj.addRow(new Object[] {++SrNo,product_name,qnttxt,amount,totalamt});
        //tblobj.insertRow(0, new Object[] {SrNo,product_name,qnttxt,amount,totalamt});
        //tblobj.insertRow(1, new Object[] {SrNo,product_name,qnttxt,amount,totalamt});
@@ -399,13 +459,13 @@ public class Bill_item extends javax.swing.JFrame {
        
     }//GEN-LAST:event_bill1_btn_addActionPerformed
 
-    
-    String[][] gettable()
-    {        
-        return arr;
-    }
-    
-    
+//    
+//    String[][] gettable()
+//    {        
+//        return arr;
+//    }
+//    
+//    
     
     private void bill1_tblComponentAdded(java.awt.event.ContainerEvent evt) {//GEN-FIRST:event_bill1_tblComponentAdded
         // TODO add your handling code here:

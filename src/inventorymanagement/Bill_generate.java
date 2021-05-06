@@ -371,14 +371,15 @@ public class Bill_generate extends javax.swing.JFrame {
             inscount1 = pstm.executeUpdate();
             JOptionPane.showMessageDialog(this, inscount1+" records inserted Successfully in bill_master");
             
+            
             //System.out.println("Grand Total: - " + billitem.grandtotal);
             
             System.out.println("Sr No: - " +Bill_item.SrNo);  
-        bill_id = getBillid();
-        System.out.println(bill_id + " is the bill id ");
+            bill_id = getBillid();
+            System.out.println(bill_id + " is the bill id ");
             
-       //INSERT INTO `billing_transaction` (bill_id,item_id,cus_id,Quantity,total) VALUES (?,?,?,?,?)
-       pstm = conn.prepareStatement(insquery_billtrans);
+            //INSERT INTO `billing_transaction` (bill_id,item_id,cus_id,Quantity,total) VALUES (?,?,?,?,?)
+            pstm = conn.prepareStatement(insquery_billtrans);
             
         
             for(int i=0;i<(Bill_item.SrNo);i++)

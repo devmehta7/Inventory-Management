@@ -12,10 +12,10 @@ import java.sql.DriverManager;
  */
 public class Conn {
     static Connection c;
-    static final String db_url = "jdbc:mysql://localhost:3306/invmngtdb2";
+    static final String db_url = "jdbc:mysql://localhost:3306/inventory";
     static final String db_driver = "com.mysql.jdbc.Driver";
-    static final String db_user = "root";
-    static final String db_pass = "";
+    static final String db_user = "user1";
+    static final String db_pass = "User1db@123";
 
     
     
