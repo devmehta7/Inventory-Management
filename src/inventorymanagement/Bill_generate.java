@@ -39,8 +39,8 @@ public class Bill_generate extends javax.swing.JFrame {
     static int bill_id = 0;
     
     
-    String cus_name = "";
-    String cus_mobno = "";
+    static String cus_name = "";
+    static String cus_mobno = "";
     
     
     //int counter = 0;
@@ -421,7 +421,9 @@ public class Bill_generate extends javax.swing.JFrame {
         
         
         
-        
+        Bill_preview obj = new Bill_preview();
+        obj.setVisible(true);
+        setVisible(false);
         
         //database operations       
         
@@ -609,7 +611,7 @@ public class Bill_generate extends javax.swing.JFrame {
     private javax.swing.JPanel bill2_p1;
     private javax.swing.JPanel bill2_p2;
     private javax.swing.JPanel bill2_p3;
-    private javax.swing.JTextField bill2_txt_custNm;
+    public static javax.swing.JTextField bill2_txt_custNm;
     private javax.swing.JTextField bill2_txt_mobileNo;
     // End of variables declaration//GEN-END:variables
 }

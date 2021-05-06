@@ -30,7 +30,7 @@ public class Bill_item extends javax.swing.JFrame {
     
     static int SrNo = 0;
     static double grandtotal = 0.0;
-    static String arr[][] = new String[6][6];
+    static String arr[][] = new String[100][6];
     
     double gettotal = 0.0;
     
