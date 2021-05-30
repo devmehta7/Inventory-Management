@@ -169,15 +169,8 @@ public class Add_items extends javax.swing.JFrame {
     }
 
 
-    //database connentivity
-//    static final String DB_URL = "jdbc:mysql://localhost:3306/inventory";
-//    static final String DB_DRV = "com.mysql.jdbc.Driver";
-//    static final String DB_USER = "user1";
-//    static final String DB_PASSWD = "User1db@123";
+    
 
-
-//
-//  Statement stmt=null;
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -477,77 +470,11 @@ public class Add_items extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void item_btn_addActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_item_btn_addActionPerformed
-//        String[] item_arr = new String[8];
-//        int countInserted = 0;
-//        String item_id = item_txt_id.getText();
-//        String item_name = item_txt_name.getText();
-//        String item_price = item_txt_price.getText();
-//        String item_category = item_dropdown_category.getItemAt(item_dropdown_category.getSelectedIndex());
-//        //String item_category = item_dropdown_category.getSelectedItem()
-//        Object item_qnt;
-//        item_qnt = item_spinner_qnt.getValue();
-//
-//        item_code = Integer.parseInt(item_txt_id.getText());
-//        System.out.println("id " + item_code);
-//
-//        name = item_txt_name.getText();
-//        System.out.println("name " + name);
-//
-//        Object item_qnt1;
-//        item_qnt1 = item_spinner_qnt.getValue();
-//        Quantity = Integer.parseInt(String.valueOf(item_qnt1));
-//        System.out.println("Quantity " + Quantity);
-//
-//        category_id = item_dropdown_category.getSelectedIndex();
-//        System.out.println("category " + category_id);
-//
-//        price = Double.parseDouble(item_txt_price.getText());
-//        System.out.println("price " + price);
-//
-//        try {
-//
-//            c=Conn.setConnect();
-//           //statement = connection.createStatement();
-//
-//            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
-//            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
-              String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
-              set_data(sqlInsert,0);
-//
-//
-//            pstm = c.prepareStatement(sqlInsert);
-//            pstm.setInt(1, item_code);
-//            pstm.setString(2, name);
-//            pstm.setInt(3, Quantity);
-//            pstm.setInt(4, category_id);
-//            pstm.setDouble(5, price);
-//
-//            System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
-//            countInserted = pstm.executeUpdate();
-//            System.out.println(countInserted + " records inserted.\n");
-//
-//        } catch (SQLException ex) {
-//            ex.printStackTrace();
-//        } finally {
-//            try {
-//                c.close();
-//                //statement.close();
-//            } catch (SQLException ex) {
-//                Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-//
-//        }
-//
-//        item_arr[0] = item_id;
-//        item_arr[1] = item_name;
-//        item_arr[2] = item_price;
-//        item_arr[4] = String.valueOf(item_qnt);
-//        item_arr[5] = String.valueOf(item_category);
-//        //item_arr[6] = item_address;
-//        item_arr[6] = countInserted + " records inserted.\n";
-//        item_arr[7] = "\n Records inserted successfully";
-//
-//        JOptionPane.showMessageDialog(this, item_arr);
+        
+            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (4,'',90,4,40.0)";
+            //String sqlInsert = "INSERT INTO item_master(item_code,name,Quantity,category_id,price) VALUES (item_id1,item_name1,item_qnt2,item_category1,item_price1)";
+            String sqlInsert = "INSERT INTO `item_master` (item_code,name,Quantity,category_id,price) VALUES (?,?,?,?,?)";
+            set_data(sqlInsert,0);
 
 
     }//GEN-LAST:event_item_btn_addActionPerformed

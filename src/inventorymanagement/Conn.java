@@ -13,13 +13,15 @@ import java.sql.DriverManager;
 public class Conn {
     static Connection c;
     static final String db_url = "jdbc:mysql://localhost:3306/inventory";
-    //static final String db_driver = "com.mysql.jdbc.Driver";
+    static final String db_driver = "com.mysql.jdbc.Driver";
     static final String db_user = "user1";
     static final String db_pass = "User1db@123";
+
     
     
     public  static Connection setConnect(){
         try{            
+            Class.forName("com.mysql.cj.jdbc.Driver");
             c=DriverManager.getConnection(db_url,db_user,db_pass);
             
         }
@@ -29,6 +31,7 @@ public class Conn {
         
         return c;
     }
+    
     
     
 }

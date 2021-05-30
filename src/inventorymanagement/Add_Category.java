@@ -11,7 +11,7 @@ package inventorymanagement;
  */
 
 import java.sql.Connection;
-//import java.sql.DriverManager;
+import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.logging.Level;
@@ -23,13 +23,10 @@ public class Add_Category extends javax.swing.JFrame {
     /**
      * Creates new form Add_Category
      */
-    
-//     static final String DB_URL = "jdbc:mysql://localhost:3306/invmngtdb";
-//    static final String DB_DRV = "com.mysql.jdbc.Driver";
-//    static final String DB_USER = "root";
-//    static final String DB_PASSWD = "";
+   
 
-    Connection c = null;
+    Connection connection = null;
+
     //Statement statement = null;
     PreparedStatement pstm = null;
 
@@ -51,9 +48,7 @@ public class Add_Category extends javax.swing.JFrame {
         category_p1 = new javax.swing.JPanel();
         category_lbl_title = new javax.swing.JLabel();
         category_p2 = new javax.swing.JPanel();
-        category_lbl_ctgid = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
-        category_txt_id = new javax.swing.JTextField();
         category_txt_name = new javax.swing.JTextField();
         category_btn_add = new javax.swing.JButton();
         category_btn_cancel = new javax.swing.JButton();
@@ -69,7 +64,7 @@ public class Add_Category extends javax.swing.JFrame {
             .addGap(0, 100, Short.MAX_VALUE)
         );
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setTitle("Item category");
         setBackground(new java.awt.Color(255, 255, 204));
 
@@ -78,7 +73,7 @@ public class Add_Category extends javax.swing.JFrame {
         category_p1.setForeground(new java.awt.Color(255, 255, 102));
 
         category_lbl_title.setFont(new java.awt.Font("Times New Roman", 1, 36)); // NOI18N
-        category_lbl_title.setText("Item Category");
+        category_lbl_title.setText("Add Category");
 
         javax.swing.GroupLayout category_p1Layout = new javax.swing.GroupLayout(category_p1);
         category_p1.setLayout(category_p1Layout);
@@ -87,7 +82,7 @@ public class Add_Category extends javax.swing.JFrame {
             .addGroup(category_p1Layout.createSequentialGroup()
                 .addGap(88, 88, 88)
                 .addComponent(category_lbl_title)
-                .addContainerGap(87, Short.MAX_VALUE))
+                .addContainerGap(93, Short.MAX_VALUE))
         );
         category_p1Layout.setVerticalGroup(
             category_p1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -101,13 +96,8 @@ public class Add_Category extends javax.swing.JFrame {
         category_p2.setBorder(javax.swing.BorderFactory.createBevelBorder(javax.swing.border.BevelBorder.RAISED));
         category_p2.setForeground(new java.awt.Color(255, 204, 51));
 
-        category_lbl_ctgid.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
-        category_lbl_ctgid.setText("ID");
-
-        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Times New Roman", 0, 18)); // NOI18N
         jLabel1.setText("Name");
-
-        category_txt_id.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
 
         category_txt_name.setFont(new java.awt.Font("Times New Roman", 0, 14)); // NOI18N
 
@@ -134,35 +124,27 @@ public class Add_Category extends javax.swing.JFrame {
         category_p2Layout.setHorizontalGroup(
             category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(category_p2Layout.createSequentialGroup()
-                .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                .addGap(91, 91, 91)
+                .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1)
+                    .addComponent(category_btn_add))
+                .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(category_p2Layout.createSequentialGroup()
-                        .addGap(68, 68, 68)
-                        .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jLabel1)
-                            .addComponent(category_lbl_ctgid))
-                        .addGap(67, 67, 67)
-                        .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(category_txt_id)
-                            .addComponent(category_txt_name, javax.swing.GroupLayout.DEFAULT_SIZE, 128, Short.MAX_VALUE)))
+                        .addGap(79, 79, 79)
+                        .addComponent(category_btn_cancel))
                     .addGroup(category_p2Layout.createSequentialGroup()
-                        .addGap(91, 91, 91)
-                        .addComponent(category_btn_add)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 79, Short.MAX_VALUE)
-                        .addComponent(category_btn_cancel)))
+                        .addGap(35, 35, 35)
+                        .addComponent(category_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, 128, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         category_p2Layout.setVerticalGroup(
             category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(category_p2Layout.createSequentialGroup()
-                .addGap(34, 34, 34)
-                .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(category_lbl_ctgid)
-                    .addComponent(category_txt_id, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                .addGap(30, 30, 30)
+                .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel1)
                     .addComponent(category_txt_name, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 46, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 91, Short.MAX_VALUE)
                 .addGroup(category_p2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(category_btn_add)
                     .addComponent(category_btn_cancel))
@@ -192,31 +174,32 @@ public class Add_Category extends javax.swing.JFrame {
         // TODO add your handling code here:
         
         //decleration
-        String[] item_arr = new String[3];
+        String[] item_arr = new String[2];
         int countInserted = 0;
         
         //getting the value from form components
-        int category_id = Integer.parseInt(category_txt_id.getText());
+        //int category_id = Integer.parseInt(category_txt_id.getText());
         String category_name = category_txt_name.getText();
         
         //displaying the data
-        System.out.println("Categroy ID: - " + category_id);
+        //System.out.println("Categroy ID: - " + category_id);
         System.out.println("Category Name: - " + category_name);
         
         //Database 
         //insert operations
         try {
 
-            c = Conn.setConnect();
+            connection = Conn.setConnect();
             //statement = connection.createStatement();
 
             //String sqlInsert = "INSERT INTO category(id,name) VALUES (4,'')";
             //String sqlInsert = "INSERT INTO category(id,name) VALUES (category_id,category_name)";
-            String sqlInsert = "INSERT INTO `Category` (id,name) VALUES (?,?)";
+            String sqlInsert = "INSERT INTO `category` (name) VALUES (?)";
 
-            PreparedStatement pstm = c.prepareStatement(sqlInsert);
-            pstm.setInt(1, category_id);
-            pstm.setString(2, category_name);
+            PreparedStatement pstm = connection.prepareStatement(sqlInsert);
+
+            //pstm.setInt(1, category_id);
+            pstm.setString(1, category_name);
            
             System.out.println("The SQL statement is: " + sqlInsert + "\n");  // Echo for debugging
             countInserted = pstm.executeUpdate();
@@ -226,7 +209,7 @@ public class Add_Category extends javax.swing.JFrame {
             ex.printStackTrace();
         } finally {
             try {
-                c.close();
+                connection.close();
                 //statement.close();
             } catch (SQLException ex) {
                 Logger.getLogger(Add_items.class.getName()).log(Level.SEVERE, null, ex);
@@ -234,9 +217,9 @@ public class Add_Category extends javax.swing.JFrame {
         }
         
         //displaying the data into message dialog box
-        item_arr[0] = String.valueOf(category_id);
-        item_arr[1] = category_name;
-        item_arr[2] = countInserted + " records inserted successfully.\n";
+        //item_arr[0] = String.valueOf(category_id);
+        item_arr[0] = category_name;
+        item_arr[1] = countInserted + " records inserted successfully.\n";
         JOptionPane.showMessageDialog(this, item_arr);
         
         
@@ -278,6 +261,9 @@ public class Add_Category extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Add_Category.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -290,11 +276,9 @@ public class Add_Category extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton category_btn_add;
     private javax.swing.JButton category_btn_cancel;
-    private javax.swing.JLabel category_lbl_ctgid;
     private javax.swing.JLabel category_lbl_title;
     private javax.swing.JPanel category_p1;
     private javax.swing.JPanel category_p2;
-    private javax.swing.JTextField category_txt_id;
     private javax.swing.JTextField category_txt_name;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
