@@ -1,3 +1,5 @@
 # InventoryManagement
-A basic level college project-
-Inventory management project built using JAVA and MYSQL  
+
+Inventory Management System works for retail stores and warehouses to account their sales and stocks.
+
+Technologies: JAVA and MYSQL.  
